@@ -107,6 +107,21 @@
     }
     #logMomentBtn:hover { transform: translateY(-1px); }
 
+    #snapshotBtn {
+      display: none;
+      padding: 0.9rem 2rem;
+      border: 2px solid #6366f1;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: transparent;
+      color: #a5b4fc;
+      transition: transform 0.15s, background 0.15s;
+      white-space: nowrap;
+    }
+    #snapshotBtn:hover { transform: translateY(-1px); background: rgba(99, 102, 241, 0.1); }
+
     /* ── Cards ── */
     .card {
       background: var(--card);
@@ -356,6 +371,7 @@
       </button>
       <button id="logMomentBtn">📌 Log Moment</button>
     </div>
+    <button id="snapshotBtn">📸 Snapshot &amp; New Session</button>
 
     <!-- Gauge -->
     <div class="card hidden" id="gaugeCard">
@@ -460,6 +476,7 @@
     // ── DOM refs ──
     const startBtn        = document.getElementById('startBtn');
     const logMomentBtn    = document.getElementById('logMomentBtn');
+    const snapshotBtn     = document.getElementById('snapshotBtn');
     const btnText         = document.getElementById('btnText');
     const gaugeCard       = document.getElementById('gaugeCard');
     const peakCard        = document.getElementById('peakCard');
@@ -544,10 +561,10 @@
       return m + 'm ' + s + 's';
     }
 
-    // ── Render Achievements ──
+    // ── Render Achievements (biggest first) ──
     function renderAchievements() {
       achList.innerHTML = '';
-      achievements.forEach(a => {
+      [...achievements].reverse().forEach(a => {
         const hit = allTimeRecord >= a.db;
         const totalDur = achDurations[a.db] || 0;
         const maxStreak = achMaxStreaks[a.db] || 0;
@@ -902,6 +919,7 @@
         startBtn.classList.add('listening');
         btnText.textContent = 'Stop Listening';
         logMomentBtn.style.display = 'block';
+        snapshotBtn.style.display = 'block';
 
         [gaugeCard, peakCard, achCard, barCard, waveCard, momentsCard, statsCard].forEach(c => c.classList.remove('hidden'));
 
@@ -926,6 +944,7 @@
       startBtn.classList.remove('listening');
       btnText.textContent = 'Start Listening';
       logMomentBtn.style.display = 'none';
+      snapshotBtn.style.display = 'none';
       // Final persist
       localStorage.setItem('db_ach_durations', JSON.stringify(achDurations));
       localStorage.setItem('db_ach_max_streaks', JSON.stringify(achMaxStreaks));
@@ -934,6 +953,81 @@
 
     startBtn.addEventListener('click', () => {
       if (listening) stopListening(); else startListening();
+    });
+
+    // ── Snapshot & Clear ──
+    snapshotBtn.addEventListener('click', () => {
+      const confirmed = confirm(
+        '📸 Snapshot & New Session\n\n' +
+        'This will:\n' +
+        '• Save current data as a snapshot (downloaded as JSON)\n' +
+        '• Clear all records, achievements, and moments\n' +
+        '• Start fresh for a new celebration!\n\n' +
+        'Continue?'
+      );
+      if (!confirmed) return;
+
+      // Build snapshot
+      const snapshot = {
+        exportedAt: new Date().toISOString(),
+        record: { db: allTimeRecord, time: allTimeRecordTime },
+        achievements: achievements.map(a => ({
+          name: a.name,
+          db: a.db,
+          achieved: allTimeRecord >= a.db,
+          totalDuration: achDurations[a.db] || 0,
+          bestStreak: achMaxStreaks[a.db] || 0,
+        })),
+        moments: moments.map(m => ({ db: m.db, time: m.time, label: m.label, duration: m.duration || 0 })),
+        sessionStats: {
+          min: sessionMin === Infinity ? null : sessionMin,
+          avg: sessionCount > 0 ? Math.round(sessionSum / sessionCount) : null,
+          max: sessionMax === -Infinity ? null : sessionMax,
+        },
+      };
+
+      // Download as JSON
+      const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'excitement-snapshot-' + new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-') + '.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      // Clear all persisted data
+      allTimeRecord = 0;
+      allTimeRecordTime = '';
+      moments = [];
+      achDurations = {};
+      achMaxStreaks = {};
+      achCurrentStreaks = {};
+      topPeaks = [];
+      localStorage.removeItem('db_record');
+      localStorage.removeItem('db_record_time');
+      localStorage.removeItem('db_moments');
+      localStorage.removeItem('db_ach_durations');
+      localStorage.removeItem('db_ach_max_streaks');
+      localStorage.removeItem('db_top_peaks');
+
+      // Reset session stats
+      sessionMin = Infinity;
+      sessionMax = -Infinity;
+      sessionSum = 0;
+      sessionCount = 0;
+      peakDb = 0;
+
+      // Re-render everything
+      peakRecordDb.textContent = '--';
+      peakRecordTime.textContent = 'Make some noise!';
+      barRecordMarker.style.left = '0%';
+      statMin.textContent = '--';
+      statAvg.textContent = '--';
+      statMax.textContent = '--';
+      renderAchievements();
+      renderMoments();
     });
   </script>
 </body>
