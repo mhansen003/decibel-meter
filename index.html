@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Decibel Meter</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔊</text></svg>">
+  <style>
+    :root {
+      --bg: #0a0e17;
+      --card: #111827;
+      --border: #1e293b;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --orange: #f97316;
+      --red: #ef4444;
+      --accent: #3b82f6;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    header {
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      color: var(--muted);
+      margin-top: 0.3rem;
+      font-size: 0.95rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 700px;
+      padding: 0 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    /* ── Start Button ── */
+    #startBtn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.9rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #6366f1);
+      color: #fff;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+    }
+    #startBtn:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(59, 130, 246, 0.45); }
+    #startBtn:active { transform: translateY(0); }
+    #startBtn.listening {
+      background: linear-gradient(135deg, #dc2626, #f97316);
+      box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      transition: opacity 0.3s;
+    }
+    .card.hidden { display: none; }
+
+    .card-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    /* ── Gauge ── */
+    .gauge-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .gauge-container {
+      position: relative;
+      width: 320px;
+      height: 180px;
+    }
+
+    canvas#gaugeCanvas {
+      width: 320px;
+      height: 180px;
+    }
+
+    .db-readout {
+      text-align: center;
+      margin-top: 0.5rem;
+    }
+
+    .db-value {
+      font-size: 3.5rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      transition: color 0.15s;
+    }
+
+    .db-unit {
+      font-size: 1.1rem;
+      color: var(--muted);
+      margin-left: 0.2rem;
+    }
+
+    .db-label {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-top: 0.3rem;
+      transition: color 0.15s;
+    }
+
+    /* ── Bar Meter ── */
+    .bar-meter {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .bar-track {
+      height: 32px;
+      background: #1a2234;
+      border-radius: 8px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 8px;
+      transition: width 0.08s linear;
+      background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 50%, var(--orange) 75%, var(--red) 100%);
+    }
+
+    .bar-peak {
+      position: absolute;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: #fff;
+      border-radius: 2px;
+      transition: left 0.05s linear;
+      opacity: 0.9;
+    }
+
+    .bar-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* ── Waveform ── */
+    canvas#waveCanvas {
+      width: 100%;
+      height: 120px;
+      border-radius: 8px;
+      background: #0d1321;
+    }
+
+    /* ── Stats ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.6rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    /* ── Noise Level Guide ── */
+    .guide-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    .guide-table td {
+      padding: 0.5rem 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .guide-table tr:last-child td { border-bottom: none; }
+
+    .guide-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 0.5rem;
+      vertical-align: middle;
+    }
+
+    .guide-db {
+      color: var(--muted);
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 500px) {
+      .gauge-container { width: 260px; height: 150px; }
+      canvas#gaugeCanvas { width: 260px; height: 150px; }
+      .db-value { font-size: 2.8rem; }
+      .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+      .stat-value { font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🎤 Live Decibel Meter</h1>
+    <p>Real-time noise level monitoring</p>
+  </header>
+
+  <div class="container">
+    <button id="startBtn">
+      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+      <span id="btnText">Start Listening</span>
+    </button>
+
+    <!-- Gauge -->
+    <div class="card hidden" id="gaugeCard">
+      <div class="card-title">Noise Level</div>
+      <div class="gauge-wrap">
+        <div class="gauge-container">
+          <canvas id="gaugeCanvas" width="640" height="360"></canvas>
+        </div>
+        <div class="db-readout">
+          <span class="db-value" id="dbValue">--</span><span class="db-unit">dB</span>
+          <div class="db-label" id="dbLabel">Waiting...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bar Meter -->
+    <div class="card hidden" id="barCard">
+      <div class="card-title">Level Meter</div>
+      <div class="bar-meter">
+        <div class="bar-track">
+          <div class="bar-fill" id="barFill"></div>
+          <div class="bar-peak" id="barPeak"></div>
+        </div>
+        <div class="bar-labels">
+          <span>0 dB</span>
+          <span>30</span>
+          <span>60</span>
+          <span>90</span>
+          <span>120 dB</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Waveform -->
+    <div class="card hidden" id="waveCard">
+      <div class="card-title">Live Waveform</div>
+      <canvas id="waveCanvas" width="1400" height="240"></canvas>
+    </div>
+
+    <!-- Stats -->
+    <div class="card hidden" id="statsCard">
+      <div class="card-title">Session Statistics</div>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="statMin">--</div>
+          <div class="stat-label">Min dB</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statAvg">--</div>
+          <div class="stat-label">Avg dB</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="statMax">--</div>
+          <div class="stat-label">Max dB</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Guide -->
+    <div class="card">
+      <div class="card-title">Noise Level Guide</div>
+      <table class="guide-table">
+        <tr>
+          <td><span class="guide-dot" style="background:var(--green)"></span>Quiet (Library)</td>
+          <td class="guide-db">0 – 30 dB</td>
+        </tr>
+        <tr>
+          <td><span class="guide-dot" style="background:var(--green)"></span>Normal Conversation</td>
+          <td class="guide-db">30 – 60 dB</td>
+        </tr>
+        <tr>
+          <td><span class="guide-dot" style="background:var(--yellow)"></span>Loud (Traffic)</td>
+          <td class="guide-db">60 – 80 dB</td>
+        </tr>
+        <tr>
+          <td><span class="guide-dot" style="background:var(--orange)"></span>Very Loud (Machinery)</td>
+          <td class="guide-db">80 – 100 dB</td>
+        </tr>
+        <tr>
+          <td><span class="guide-dot" style="background:var(--red)"></span>Dangerous (Jet Engine)</td>
+          <td class="guide-db">100 – 130 dB</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // ── DOM refs ──
+    const startBtn   = document.getElementById('startBtn');
+    const btnText    = document.getElementById('btnText');
+    const gaugeCard  = document.getElementById('gaugeCard');
+    const barCard    = document.getElementById('barCard');
+    const waveCard   = document.getElementById('waveCard');
+    const statsCard  = document.getElementById('statsCard');
+    const dbValue    = document.getElementById('dbValue');
+    const dbLabel    = document.getElementById('dbLabel');
+    const barFill    = document.getElementById('barFill');
+    const barPeak    = document.getElementById('barPeak');
+    const statMin    = document.getElementById('statMin');
+    const statAvg    = document.getElementById('statAvg');
+    const statMax    = document.getElementById('statMax');
+
+    const gaugeCanvas = document.getElementById('gaugeCanvas');
+    const gaugeCtx    = gaugeCanvas.getContext('2d');
+    const waveCanvas  = document.getElementById('waveCanvas');
+    const waveCtx     = waveCanvas.getContext('2d');
+
+    // ── State ──
+    let audioCtx, analyser, source, stream;
+    let listening = false;
+    let animId;
+    let peakDb = 0;
+    let peakDecay = 0;
+    let sessionMin = Infinity, sessionMax = -Infinity, sessionSum = 0, sessionCount = 0;
+
+    // ── Helpers ──
+    function getLevel(db) {
+      if (db < 30) return { color: 'var(--green)',  label: 'Quiet' };
+      if (db < 60) return { color: 'var(--green)',  label: 'Normal' };
+      if (db < 80) return { color: 'var(--yellow)', label: 'Loud' };
+      if (db < 100) return { color: 'var(--orange)', label: 'Very Loud' };
+      return { color: 'var(--red)', label: 'Dangerous!' };
+    }
+
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+    // ── Gauge Drawing ──
+    function drawGauge(db) {
+      const W = gaugeCanvas.width;
+      const H = gaugeCanvas.height;
+      const cx = W / 2;
+      const cy = H - 20;
+      const radius = Math.min(cx, cy) - 30;
+
+      gaugeCtx.clearRect(0, 0, W, H);
+
+      // Arc background segments
+      const startAngle = Math.PI;
+      const endAngle = 2 * Math.PI;
+      const segments = [
+        { end: 0.25, color: '#22c55e' },
+        { end: 0.50, color: '#84cc16' },
+        { end: 0.67, color: '#eab308' },
+        { end: 0.83, color: '#f97316' },
+        { end: 1.00, color: '#ef4444' },
+      ];
+
+      let prevFrac = 0;
+      segments.forEach(seg => {
+        const a1 = startAngle + prevFrac * Math.PI;
+        const a2 = startAngle + seg.end * Math.PI;
+        gaugeCtx.beginPath();
+        gaugeCtx.arc(cx, cy, radius, a1, a2);
+        gaugeCtx.lineWidth = 22;
+        gaugeCtx.strokeStyle = seg.color;
+        gaugeCtx.lineCap = 'butt';
+        gaugeCtx.globalAlpha = 0.25;
+        gaugeCtx.stroke();
+        prevFrac = seg.end;
+      });
+
+      // Active arc
+      const fraction = clamp(db / 130, 0, 1);
+      prevFrac = 0;
+      segments.forEach(seg => {
+        const segStart = prevFrac;
+        const segEnd = seg.end;
+        if (fraction > segStart) {
+          const a1 = startAngle + segStart * Math.PI;
+          const a2 = startAngle + Math.min(fraction, segEnd) * Math.PI;
+          gaugeCtx.beginPath();
+          gaugeCtx.arc(cx, cy, radius, a1, a2);
+          gaugeCtx.lineWidth = 22;
+          gaugeCtx.strokeStyle = seg.color;
+          gaugeCtx.globalAlpha = 1;
+          gaugeCtx.stroke();
+        }
+        prevFrac = segEnd;
+      });
+
+      gaugeCtx.globalAlpha = 1;
+
+      // Tick marks
+      for (let i = 0; i <= 13; i++) {
+        const angle = startAngle + (i / 13) * Math.PI;
+        const isMajor = i % 3 === 0;
+        const innerR = radius - (isMajor ? 32 : 26);
+        const outerR = radius - 16;
+        gaugeCtx.beginPath();
+        gaugeCtx.moveTo(cx + innerR * Math.cos(angle), cy + innerR * Math.sin(angle));
+        gaugeCtx.lineTo(cx + outerR * Math.cos(angle), cy + outerR * Math.sin(angle));
+        gaugeCtx.strokeStyle = isMajor ? '#94a3b8' : '#475569';
+        gaugeCtx.lineWidth = isMajor ? 2 : 1;
+        gaugeCtx.stroke();
+
+        if (isMajor) {
+          const labelR = innerR - 14;
+          gaugeCtx.fillStyle = '#94a3b8';
+          gaugeCtx.font = '600 13px system-ui';
+          gaugeCtx.textAlign = 'center';
+          gaugeCtx.textBaseline = 'middle';
+          gaugeCtx.fillText(String(i * 10), cx + labelR * Math.cos(angle), cy + labelR * Math.sin(angle));
+        }
+      }
+
+      // Needle
+      const needleAngle = startAngle + fraction * Math.PI;
+      const needleLen = radius - 38;
+      gaugeCtx.save();
+      gaugeCtx.translate(cx, cy);
+      gaugeCtx.rotate(needleAngle);
+      gaugeCtx.beginPath();
+      gaugeCtx.moveTo(0, -3);
+      gaugeCtx.lineTo(needleLen, 0);
+      gaugeCtx.lineTo(0, 3);
+      gaugeCtx.closePath();
+      gaugeCtx.fillStyle = '#f8fafc';
+      gaugeCtx.shadowColor = 'rgba(255,255,255,0.3)';
+      gaugeCtx.shadowBlur = 8;
+      gaugeCtx.fill();
+      gaugeCtx.restore();
+
+      // Center dot
+      gaugeCtx.beginPath();
+      gaugeCtx.arc(cx, cy, 7, 0, Math.PI * 2);
+      gaugeCtx.fillStyle = '#e2e8f0';
+      gaugeCtx.fill();
+    }
+
+    // ── Waveform Drawing ──
+    function drawWaveform(dataArray) {
+      const W = waveCanvas.width;
+      const H = waveCanvas.height;
+      waveCtx.clearRect(0, 0, W, H);
+
+      // Gradient line
+      const grad = waveCtx.createLinearGradient(0, 0, W, 0);
+      grad.addColorStop(0, '#3b82f6');
+      grad.addColorStop(0.5, '#a78bfa');
+      grad.addColorStop(1, '#3b82f6');
+
+      waveCtx.beginPath();
+      const sliceWidth = W / dataArray.length;
+      let x = 0;
+      for (let i = 0; i < dataArray.length; i++) {
+        const v = dataArray[i] / 128.0;
+        const y = (v * H) / 2;
+        if (i === 0) waveCtx.moveTo(x, y);
+        else waveCtx.lineTo(x, y);
+        x += sliceWidth;
+      }
+      waveCtx.strokeStyle = grad;
+      waveCtx.lineWidth = 2;
+      waveCtx.stroke();
+
+      // Glow effect
+      waveCtx.strokeStyle = grad;
+      waveCtx.lineWidth = 1;
+      waveCtx.globalAlpha = 0.3;
+      waveCtx.stroke();
+      waveCtx.globalAlpha = 1;
+    }
+
+    // ── Main Loop ──
+    function loop() {
+      if (!listening) return;
+
+      const bufferLength = analyser.fftSize;
+      const dataArray = new Float32Array(bufferLength);
+      analyser.getFloatTimeDomainData(dataArray);
+
+      // Calculate RMS → dB
+      let sumSq = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        sumSq += dataArray[i] * dataArray[i];
+      }
+      const rms = Math.sqrt(sumSq / bufferLength);
+      // Map to approximate dB SPL (calibrated for typical laptop mics)
+      // Raw dBFS + offset to approximate real-world dB SPL
+      let db = rms > 0.0001 ? 20 * Math.log10(rms) + 94 : 0;
+      db = clamp(Math.round(db), 0, 130);
+
+      // Update peak
+      if (db > peakDb) {
+        peakDb = db;
+        peakDecay = 0;
+      } else {
+        peakDecay++;
+        if (peakDecay > 40) {
+          peakDb = Math.max(peakDb - 0.5, db);
+        }
+      }
+
+      // Update stats
+      if (db > 0) {
+        sessionMin = Math.min(sessionMin, db);
+        sessionMax = Math.max(sessionMax, db);
+        sessionSum += db;
+        sessionCount++;
+      }
+
+      // Update UI
+      const level = getLevel(db);
+      dbValue.textContent = db;
+      dbValue.style.color = level.color;
+      dbLabel.textContent = level.label;
+      dbLabel.style.color = level.color;
+
+      // Bar meter
+      const pct = (db / 130) * 100;
+      barFill.style.width = pct + '%';
+      barPeak.style.left = ((peakDb / 130) * 100) + '%';
+
+      // Gauge
+      drawGauge(db);
+
+      // Waveform (use byte data for waveform visualization)
+      const waveData = new Uint8Array(analyser.fftSize);
+      analyser.getByteTimeDomainData(waveData);
+      drawWaveform(waveData);
+
+      // Stats
+      if (sessionCount > 0) {
+        statMin.textContent = sessionMin === Infinity ? '--' : sessionMin;
+        statAvg.textContent = Math.round(sessionSum / sessionCount);
+        statMax.textContent = sessionMax === -Infinity ? '--' : sessionMax;
+      }
+
+      animId = requestAnimationFrame(loop);
+    }
+
+    // ── Start / Stop ──
+    async function startListening() {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        analyser.smoothingTimeConstant = 0.8;
+        source = audioCtx.createMediaStreamSource(stream);
+        source.connect(analyser);
+
+        listening = true;
+        startBtn.classList.add('listening');
+        btnText.textContent = 'Stop Listening';
+
+        // Show cards
+        [gaugeCard, barCard, waveCard, statsCard].forEach(c => c.classList.remove('hidden'));
+
+        // Reset stats
+        sessionMin = Infinity;
+        sessionMax = -Infinity;
+        sessionSum = 0;
+        sessionCount = 0;
+        peakDb = 0;
+
+        loop();
+      } catch (err) {
+        alert('Microphone access is required.\n\n' + err.message);
+      }
+    }
+
+    function stopListening() {
+      listening = false;
+      cancelAnimationFrame(animId);
+      if (source) source.disconnect();
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      if (audioCtx) audioCtx.close();
+      startBtn.classList.remove('listening');
+      btnText.textContent = 'Start Listening';
+    }
+
+    startBtn.addEventListener('click', () => {
+      if (listening) stopListening();
+      else startListening();
+    });
+  </script>
+</body>
+</html>
