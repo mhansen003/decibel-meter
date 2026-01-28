@@ -18,8 +18,8 @@
       --red: #ef4444;
       --accent: #3b82f6;
       --gold: #fbbf24;
+      --sidebar-w: 280px;
     }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
@@ -28,14 +28,134 @@
       color: var(--text);
       min-height: 100vh;
       display: flex;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: #0d1117;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 1.2rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .sidebar-header p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+    }
+
+    .snap-count {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 10px;
+      font-weight: 700;
+    }
+
+    .snap-list {
+      flex: 1;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      overflow-y: auto;
+    }
+
+    .snap-empty {
+      color: var(--muted);
+      font-size: 0.8rem;
+      text-align: center;
+      padding: 2rem 1rem;
+      line-height: 1.5;
+    }
+
+    .snap-item {
+      padding: 0.7rem 0.8rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .snap-item:hover {
+      border-color: var(--accent);
+      background: #161f30;
+    }
+    .snap-item.active {
+      border-color: var(--gold);
+      background: rgba(251, 191, 36, 0.06);
+    }
+
+    .snap-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .snap-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .snap-peak {
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .snap-delete {
+      margin-left: auto;
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.85rem;
+      padding: 0.15rem 0.3rem;
+      border-radius: 4px;
+      transition: color 0.15s, background 0.15s;
+    }
+    .snap-delete:hover {
+      color: var(--red);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* ── Main Area ── */
+    .main {
+      flex: 1;
+      display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
+      overflow-y: auto;
+      min-width: 0;
     }
 
     header {
       text-align: center;
-      padding: 2rem 1rem 1rem;
+      padding: 1.5rem 1rem 0.8rem;
     }
 
     header h1 {
@@ -47,11 +167,7 @@
       background-clip: text;
     }
 
-    header p {
-      color: var(--muted);
-      margin-top: 0.3rem;
-      font-size: 0.95rem;
-    }
+    header p { color: var(--muted); margin-top: 0.3rem; font-size: 0.95rem; }
 
     .container {
       width: 100%;
@@ -63,10 +179,7 @@
     }
 
     /* ── Buttons ── */
-    .btn-row {
-      display: flex;
-      gap: 0.6rem;
-    }
+    .btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 
     #startBtn {
       flex: 1;
@@ -92,35 +205,144 @@
       box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
     }
 
-    #logMomentBtn {
+    .action-btn {
       display: none;
       padding: 0.9rem 1.2rem;
       border: none;
       border-radius: 12px;
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
-      background: linear-gradient(135deg, var(--gold), #f59e0b);
-      color: #000;
       transition: transform 0.15s;
       white-space: nowrap;
     }
-    #logMomentBtn:hover { transform: translateY(-1px); }
+    .action-btn:hover { transform: translateY(-1px); }
+
+    #logMomentBtn {
+      background: linear-gradient(135deg, var(--gold), #f59e0b);
+      color: #000;
+    }
 
     #snapshotBtn {
-      display: none;
-      padding: 0.9rem 2rem;
       border: 2px solid #6366f1;
-      border-radius: 12px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      cursor: pointer;
       background: transparent;
       color: #a5b4fc;
-      transition: transform 0.15s, background 0.15s;
-      white-space: nowrap;
     }
-    #snapshotBtn:hover { transform: translateY(-1px); background: rgba(99, 102, 241, 0.1); }
+    #snapshotBtn:hover { background: rgba(99, 102, 241, 0.1); }
+
+    /* ── Snapshot Detail Overlay ── */
+    .snap-detail-overlay {
+      display: none;
+    }
+    .snap-detail-overlay.visible {
+      display: block;
+    }
+
+    .snap-detail-banner {
+      background: linear-gradient(135deg, #1e1b4b, #312e81);
+      border: 1px solid #4338ca;
+      border-radius: 14px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .snap-detail-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .snap-detail-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .snap-detail-close {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: var(--text);
+      cursor: pointer;
+      padding: 0.3rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+    .snap-detail-close:hover { background: rgba(255,255,255,0.2); }
+
+    .snap-detail-stats {
+      display: flex;
+      gap: 1.5rem;
+      margin-top: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .snap-detail-stat {
+      text-align: center;
+    }
+
+    .snap-detail-stat .val {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .snap-detail-stat .lbl {
+      font-size: 0.7rem;
+      color: #a5b4fc;
+      text-transform: uppercase;
+    }
+
+    .snap-detail-moments {
+      margin-top: 0.8rem;
+    }
+
+    .snap-detail-moments-title {
+      font-size: 0.75rem;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .snap-moment-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.35rem 0;
+      font-size: 0.85rem;
+      border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+    }
+    .snap-moment-item:last-child { border-bottom: none; }
+
+    .snap-moment-db {
+      font-weight: 700;
+      min-width: 3.5rem;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .snap-moment-label { flex: 1; }
+    .snap-moment-time { color: #818cf8; font-size: 0.78rem; }
+
+    .snap-detail-achs {
+      margin-top: 0.8rem;
+    }
+
+    .snap-detail-achs-title {
+      font-size: 0.75rem;
+      color: #a5b4fc;
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+
+    .snap-ach-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      padding: 0.25rem 0.6rem;
+      background: rgba(99, 102, 241, 0.15);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      margin: 0.15rem;
+    }
+    .snap-ach-item.locked { opacity: 0.35; }
 
     /* ── Cards ── */
     .card {
@@ -131,7 +353,6 @@
       transition: opacity 0.3s;
     }
     .card.hidden { display: none; }
-
     .card-title {
       font-size: 0.8rem;
       text-transform: uppercase;
@@ -141,197 +362,64 @@
     }
 
     /* ── Gauge ── */
-    .gauge-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .gauge-container {
-      position: relative;
-      width: 320px;
-      height: 180px;
-    }
-
+    .gauge-wrap { display: flex; flex-direction: column; align-items: center; }
+    .gauge-container { position: relative; width: 320px; height: 180px; }
     canvas#gaugeCanvas { width: 320px; height: 180px; }
-
     .db-readout { text-align: center; margin-top: 0.5rem; }
-
-    .db-value {
-      font-size: 3.5rem;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      line-height: 1;
-      transition: color 0.15s;
-    }
-
+    .db-value { font-size: 3.5rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; transition: color 0.15s; }
     .db-unit { font-size: 1.1rem; color: var(--muted); margin-left: 0.2rem; }
-
-    .db-label {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-top: 0.3rem;
-      transition: color 0.15s;
-    }
+    .db-label { font-size: 1rem; font-weight: 600; margin-top: 0.3rem; transition: color 0.15s; }
 
     /* ── Peak Record ── */
-    .peak-record {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
+    .peak-record { display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
     .peak-trophy { text-align: center; }
     .peak-trophy .trophy-icon { font-size: 2.8rem; line-height: 1; }
     .peak-trophy .trophy-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin-top: 0.2rem; }
-
-    .peak-db {
-      font-size: 4rem; font-weight: 900; font-variant-numeric: tabular-nums;
-      color: var(--gold); line-height: 1;
-      text-shadow: 0 0 30px rgba(251, 191, 36, 0.4);
-    }
+    .peak-db { font-size: 4rem; font-weight: 900; font-variant-numeric: tabular-nums; color: var(--gold); line-height: 1; text-shadow: 0 0 30px rgba(251,191,36,0.4); }
     .peak-db-unit { font-size: 1.2rem; color: var(--gold); opacity: 0.7; }
     .peak-time { font-size: 0.8rem; color: var(--muted); text-align: center; margin-top: 0.5rem; }
-
-    @keyframes newRecord {
-      0% { transform: scale(1); }
-      20% { transform: scale(1.15); }
-      40% { transform: scale(1); }
-      60% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
+    @keyframes newRecord { 0%{transform:scale(1)} 20%{transform:scale(1.15)} 40%{transform:scale(1)} 60%{transform:scale(1.1)} 100%{transform:scale(1)} }
     .peak-record.flash .peak-db { animation: newRecord 0.6s ease; }
-    @keyframes flash-border {
-      0% { border-color: var(--gold); box-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
-      100% { border-color: var(--border); box-shadow: none; }
-    }
+    @keyframes flash-border { 0%{border-color:var(--gold);box-shadow:0 0 20px rgba(251,191,36,0.5)} 100%{border-color:var(--border);box-shadow:none} }
     .card.flash-card { animation: flash-border 1.5s ease-out; }
 
     /* ── Achievements ── */
-    .achievements {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .ach-row {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      padding: 0.65rem 0.8rem;
-      background: #0d1321;
-      border-radius: 10px;
-      border-left: 4px solid var(--border);
-      transition: border-color 0.3s, background 0.3s;
-    }
-    .ach-row.achieved {
-      border-left-color: var(--green);
-      background: rgba(34, 197, 94, 0.08);
-    }
-
+    .achievements { display: flex; flex-direction: column; gap: 0.5rem; }
+    .ach-row { display: flex; align-items: center; gap: 0.8rem; padding: 0.65rem 0.8rem; background: #0d1321; border-radius: 10px; border-left: 4px solid var(--border); transition: border-color 0.3s, background 0.3s; }
+    .ach-row.achieved { border-left-color: var(--green); background: rgba(34,197,94,0.08); }
     .ach-icon { font-size: 1.3rem; width: 2rem; text-align: center; flex-shrink: 0; }
-
     .ach-info { flex: 1; min-width: 0; }
     .ach-name { font-weight: 600; font-size: 0.95rem; }
     .ach-desc { font-size: 0.78rem; color: var(--muted); }
-
-    .ach-right {
-      text-align: right;
-      flex-shrink: 0;
-    }
+    .ach-right { text-align: right; flex-shrink: 0; }
     .ach-target { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 0.95rem; }
     .ach-duration { font-size: 0.72rem; color: var(--gold); margin-top: 1px; }
     .ach-check { font-size: 1.1rem; width: 1.5rem; text-align: center; flex-shrink: 0; }
 
-    /* ── Excitement Moments Log ── */
-    .moments-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-    }
-
-    .moment-row {
-      display: flex;
-      align-items: center;
-      gap: 0.7rem;
-      padding: 0.55rem 0.7rem;
-      background: #0d1321;
-      border-radius: 8px;
-      font-size: 0.88rem;
-    }
-
+    /* ── Moments ── */
+    .moments-list { display: flex; flex-direction: column; gap: 0.4rem; }
+    .moment-row { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0.7rem; background: #0d1321; border-radius: 8px; font-size: 0.88rem; }
     .moment-rank { font-weight: 800; font-size: 1rem; width: 2rem; text-align: center; }
-    .moment-rank.r1 { color: var(--gold); }
-    .moment-rank.r2 { color: #94a3b8; }
-    .moment-rank.r3 { color: #d97706; }
-
+    .moment-rank.r1 { color: var(--gold); } .moment-rank.r2 { color: #94a3b8; } .moment-rank.r3 { color: #d97706; }
     .moment-db { font-weight: 700; font-variant-numeric: tabular-nums; min-width: 3.5rem; }
     .moment-dur { color: var(--gold); font-size: 0.8rem; min-width: 3rem; }
     .moment-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .moment-time { color: var(--muted); font-size: 0.78rem; flex-shrink: 0; }
-
-    .moment-input {
-      flex: 1;
-      background: #1a2234;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      padding: 0.3rem 0.5rem;
-      font-size: 0.85rem;
-      font-family: inherit;
-    }
+    .moment-input { flex: 1; background: #1a2234; border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 0.3rem 0.5rem; font-size: 0.85rem; font-family: inherit; }
     .moment-input:focus { outline: none; border-color: var(--accent); }
-
-    .moment-save-btn {
-      background: var(--accent);
-      border: none;
-      border-radius: 6px;
-      color: #fff;
-      padding: 0.3rem 0.6rem;
-      cursor: pointer;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-
+    .moment-save-btn { background: var(--accent); border: none; border-radius: 6px; color: #fff; padding: 0.3rem 0.6rem; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
     .no-moments { color: var(--muted); text-align: center; padding: 1rem; font-size: 0.9rem; }
 
     /* ── Bar Meter ── */
     .bar-meter { display: flex; flex-direction: column; gap: 0.5rem; }
-
-    .bar-track {
-      height: 32px; background: #1a2234; border-radius: 8px;
-      overflow: hidden; position: relative;
-    }
-
-    .bar-fill {
-      height: 100%; width: 0%; border-radius: 8px;
-      transition: width 0.08s linear;
-      background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 40%, var(--orange) 65%, var(--red) 85%, #dc2626 100%);
-    }
-
-    .bar-peak-marker {
-      position: absolute; top: 0; width: 3px; height: 100%;
-      background: #fff; border-radius: 2px;
-      transition: left 0.05s linear; opacity: 0.9;
-    }
-
-    .bar-record-marker {
-      position: absolute; top: 0; width: 3px; height: 100%;
-      background: var(--gold); border-radius: 2px; opacity: 0.8;
-      transition: left 0.2s ease;
-    }
-
-    .bar-labels {
-      display: flex; justify-content: space-between;
-      font-size: 0.75rem; color: var(--muted);
-    }
+    .bar-track { height: 32px; background: #1a2234; border-radius: 8px; overflow: hidden; position: relative; }
+    .bar-fill { height: 100%; width: 0%; border-radius: 8px; transition: width 0.08s linear; background: linear-gradient(90deg, var(--green) 0%, var(--yellow) 40%, var(--orange) 65%, var(--red) 85%, #dc2626 100%); }
+    .bar-peak-marker { position: absolute; top: 0; width: 3px; height: 100%; background: #fff; border-radius: 2px; transition: left 0.05s linear; opacity: 0.9; }
+    .bar-record-marker { position: absolute; top: 0; width: 3px; height: 100%; background: var(--gold); border-radius: 2px; opacity: 0.8; transition: left 0.2s ease; }
+    .bar-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); }
 
     /* ── Waveform ── */
-    canvas#waveCanvas {
-      width: 100%; height: 120px; border-radius: 8px; background: #0d1321;
-    }
+    canvas#waveCanvas { width: 100%; height: 120px; border-radius: 8px; background: #0d1321; }
 
     /* ── Stats ── */
     .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
@@ -347,6 +435,12 @@
     .guide-db { color: var(--muted); text-align: right; white-space: nowrap; }
 
     /* ── Responsive ── */
+    @media (max-width: 900px) {
+      body { flex-direction: column; }
+      .sidebar { width: 100%; min-height: auto; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
+      .snap-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
+      .snap-item { min-width: 200px; flex-shrink: 0; }
+    }
     @media (max-width: 500px) {
       .gauge-container { width: 260px; height: 150px; }
       canvas#gaugeCanvas { width: 260px; height: 150px; }
@@ -358,115 +452,123 @@
   </style>
 </head>
 <body>
-  <header>
-    <h1>🎤 Audience Excitement Meter</h1>
-    <p>See which moments get the biggest crowd reaction</p>
-  </header>
-
-  <div class="container">
-    <div class="btn-row">
-      <button id="startBtn">
-        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
-        <span id="btnText">Start Listening</span>
-      </button>
-      <button id="logMomentBtn">📌 Log Moment</button>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>📸 Sessions <span class="snap-count" id="snapCount">0</span></h2>
+      <p>Past celebrations & events</p>
     </div>
-    <button id="snapshotBtn">📸 Snapshot &amp; New Session</button>
+    <div class="snap-list" id="snapList">
+      <div class="snap-empty">No snapshots yet.<br>Run a session, then hit<br>"📸 Snapshot & New Session"<br>to save it here.</div>
+    </div>
+  </aside>
 
-    <!-- Gauge -->
-    <div class="card hidden" id="gaugeCard">
-      <div class="card-title">Crowd Noise Level</div>
-      <div class="gauge-wrap">
-        <div class="gauge-container">
-          <canvas id="gaugeCanvas" width="640" height="360"></canvas>
-        </div>
-        <div class="db-readout">
-          <span class="db-value" id="dbValue">--</span><span class="db-unit">dB</span>
-          <div class="db-label" id="dbLabel">Waiting...</div>
+  <!-- Main Content -->
+  <div class="main">
+    <header>
+      <h1>🎤 Audience Excitement Meter</h1>
+      <p>See which moments get the biggest crowd reaction</p>
+    </header>
+
+    <div class="container">
+      <div class="btn-row">
+        <button id="startBtn">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+          <span id="btnText">Start Listening</span>
+        </button>
+        <button id="logMomentBtn" class="action-btn">📌 Log Moment</button>
+        <button id="snapshotBtn" class="action-btn">📸 Save &amp; Reset</button>
+      </div>
+
+      <!-- Snapshot Detail Viewer -->
+      <div class="snap-detail-overlay" id="snapDetail"></div>
+
+      <!-- Gauge -->
+      <div class="card hidden" id="gaugeCard">
+        <div class="card-title">Crowd Noise Level</div>
+        <div class="gauge-wrap">
+          <div class="gauge-container">
+            <canvas id="gaugeCanvas" width="640" height="360"></canvas>
+          </div>
+          <div class="db-readout">
+            <span class="db-value" id="dbValue">--</span><span class="db-unit">dB</span>
+            <div class="db-label" id="dbLabel">Waiting...</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Peak Record -->
-    <div class="card hidden" id="peakCard">
-      <div class="card-title">Peak Excitement Record</div>
-      <div class="peak-record" id="peakRecord">
-        <div class="peak-trophy">
-          <div class="trophy-icon">🏆</div>
-          <div class="trophy-label">Record</div>
-        </div>
-        <div>
-          <span class="peak-db" id="peakRecordDb">--</span><span class="peak-db-unit"> dB</span>
-          <div class="peak-time" id="peakRecordTime">Make some noise!</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Achievements (with duration) -->
-    <div class="card hidden" id="achCard">
-      <div class="card-title">Excitement Achievements</div>
-      <div class="achievements" id="achList"></div>
-    </div>
-
-    <!-- Bar Meter -->
-    <div class="card hidden" id="barCard">
-      <div class="card-title">Level Meter  <span style="color:var(--gold);font-size:0.7rem;">▮</span> = record</div>
-      <div class="bar-meter">
-        <div class="bar-track">
-          <div class="bar-fill" id="barFill"></div>
-          <div class="bar-record-marker" id="barRecordMarker" style="left:0%"></div>
-          <div class="bar-peak-marker" id="barPeak"></div>
-        </div>
-        <div class="bar-labels">
-          <span>0 dB</span><span>30</span><span>60</span><span>90</span><span>120</span><span>150 dB</span>
+      <!-- Peak Record -->
+      <div class="card hidden" id="peakCard">
+        <div class="card-title">Peak Excitement Record</div>
+        <div class="peak-record" id="peakRecord">
+          <div class="peak-trophy">
+            <div class="trophy-icon">🏆</div>
+            <div class="trophy-label">Record</div>
+          </div>
+          <div>
+            <span class="peak-db" id="peakRecordDb">--</span><span class="peak-db-unit"> dB</span>
+            <div class="peak-time" id="peakRecordTime">Make some noise!</div>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Waveform -->
-    <div class="card hidden" id="waveCard">
-      <div class="card-title">Live Waveform</div>
-      <canvas id="waveCanvas" width="1400" height="240"></canvas>
-    </div>
-
-    <!-- Excitement Moments Log -->
-    <div class="card hidden" id="momentsCard">
-      <div class="card-title">Top Excitement Moments</div>
-      <div class="moments-list" id="momentsList">
-        <div class="no-moments">Hit "📌 Log Moment" during peaks to capture what the audience is reacting to!</div>
+      <!-- Achievements -->
+      <div class="card hidden" id="achCard">
+        <div class="card-title">Excitement Achievements</div>
+        <div class="achievements" id="achList"></div>
       </div>
-    </div>
 
-    <!-- Stats -->
-    <div class="card hidden" id="statsCard">
-      <div class="card-title">Session Statistics</div>
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-value" id="statMin">--</div>
-          <div class="stat-label">Min dB</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="statAvg">--</div>
-          <div class="stat-label">Avg dB</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-value" id="statMax">--</div>
-          <div class="stat-label">Max dB</div>
+      <!-- Bar Meter -->
+      <div class="card hidden" id="barCard">
+        <div class="card-title">Level Meter  <span style="color:var(--gold);font-size:0.7rem;">▮</span> = record</div>
+        <div class="bar-meter">
+          <div class="bar-track">
+            <div class="bar-fill" id="barFill"></div>
+            <div class="bar-record-marker" id="barRecordMarker" style="left:0%"></div>
+            <div class="bar-peak-marker" id="barPeak"></div>
+          </div>
+          <div class="bar-labels">
+            <span>0 dB</span><span>30</span><span>60</span><span>90</span><span>120</span><span>150 dB</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Guide -->
-    <div class="card">
-      <div class="card-title">Excitement Scale</div>
-      <table class="guide-table">
-        <tr><td><span class="guide-dot" style="background:var(--green)"></span>Calm / Quiet</td><td class="guide-db">0 – 30 dB</td></tr>
-        <tr><td><span class="guide-dot" style="background:var(--green)"></span>Light Chatter</td><td class="guide-db">30 – 60 dB</td></tr>
-        <tr><td><span class="guide-dot" style="background:var(--yellow)"></span>Engaged Crowd</td><td class="guide-db">60 – 80 dB</td></tr>
-        <tr><td><span class="guide-dot" style="background:var(--orange)"></span>Excited!</td><td class="guide-db">80 – 100 dB</td></tr>
-        <tr><td><span class="guide-dot" style="background:var(--red)"></span>Going Wild!</td><td class="guide-db">100 – 120 dB</td></tr>
-        <tr><td><span class="guide-dot" style="background:#dc2626"></span>OFF THE CHARTS!</td><td class="guide-db">120 – 150 dB</td></tr>
-      </table>
+      <!-- Waveform -->
+      <div class="card hidden" id="waveCard">
+        <div class="card-title">Live Waveform</div>
+        <canvas id="waveCanvas" width="1400" height="240"></canvas>
+      </div>
+
+      <!-- Moments -->
+      <div class="card hidden" id="momentsCard">
+        <div class="card-title">Top Excitement Moments</div>
+        <div class="moments-list" id="momentsList">
+          <div class="no-moments">Hit "📌 Log Moment" during peaks to capture what the audience is reacting to!</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="card hidden" id="statsCard">
+        <div class="card-title">Session Statistics</div>
+        <div class="stats-grid">
+          <div class="stat-item"><div class="stat-value" id="statMin">--</div><div class="stat-label">Min dB</div></div>
+          <div class="stat-item"><div class="stat-value" id="statAvg">--</div><div class="stat-label">Avg dB</div></div>
+          <div class="stat-item"><div class="stat-value" id="statMax">--</div><div class="stat-label">Max dB</div></div>
+        </div>
+      </div>
+
+      <!-- Guide -->
+      <div class="card">
+        <div class="card-title">Excitement Scale</div>
+        <table class="guide-table">
+          <tr><td><span class="guide-dot" style="background:var(--green)"></span>Calm / Quiet</td><td class="guide-db">0 – 30 dB</td></tr>
+          <tr><td><span class="guide-dot" style="background:var(--green)"></span>Light Chatter</td><td class="guide-db">30 – 60 dB</td></tr>
+          <tr><td><span class="guide-dot" style="background:var(--yellow)"></span>Engaged Crowd</td><td class="guide-db">60 – 80 dB</td></tr>
+          <tr><td><span class="guide-dot" style="background:var(--orange)"></span>Excited!</td><td class="guide-db">80 – 100 dB</td></tr>
+          <tr><td><span class="guide-dot" style="background:var(--red)"></span>Going Wild!</td><td class="guide-db">100 – 120 dB</td></tr>
+          <tr><td><span class="guide-dot" style="background:#dc2626"></span>OFF THE CHARTS!</td><td class="guide-db">120 – 150 dB</td></tr>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -474,561 +576,365 @@
     const MAX_DB = 150;
 
     // ── DOM refs ──
-    const startBtn        = document.getElementById('startBtn');
-    const logMomentBtn    = document.getElementById('logMomentBtn');
-    const snapshotBtn     = document.getElementById('snapshotBtn');
-    const btnText         = document.getElementById('btnText');
-    const gaugeCard       = document.getElementById('gaugeCard');
-    const peakCard        = document.getElementById('peakCard');
-    const achCard         = document.getElementById('achCard');
-    const barCard         = document.getElementById('barCard');
-    const waveCard        = document.getElementById('waveCard');
-    const momentsCard     = document.getElementById('momentsCard');
-    const statsCard       = document.getElementById('statsCard');
-    const dbValue         = document.getElementById('dbValue');
-    const dbLabel         = document.getElementById('dbLabel');
-    const barFill         = document.getElementById('barFill');
-    const barPeak         = document.getElementById('barPeak');
-    const barRecordMarker = document.getElementById('barRecordMarker');
-    const statMin         = document.getElementById('statMin');
-    const statAvg         = document.getElementById('statAvg');
-    const statMax         = document.getElementById('statMax');
-    const peakRecordDb    = document.getElementById('peakRecordDb');
-    const peakRecordTime  = document.getElementById('peakRecordTime');
-    const peakRecord      = document.getElementById('peakRecord');
-    const achList         = document.getElementById('achList');
-    const momentsList     = document.getElementById('momentsList');
-
-    const gaugeCanvas = document.getElementById('gaugeCanvas');
-    const gaugeCtx    = gaugeCanvas.getContext('2d');
-    const waveCanvas  = document.getElementById('waveCanvas');
-    const waveCtx     = waveCanvas.getContext('2d');
+    const startBtn=document.getElementById('startBtn'), logMomentBtn=document.getElementById('logMomentBtn');
+    const snapshotBtn=document.getElementById('snapshotBtn'), btnText=document.getElementById('btnText');
+    const gaugeCard=document.getElementById('gaugeCard'), peakCard=document.getElementById('peakCard');
+    const achCard=document.getElementById('achCard'), barCard=document.getElementById('barCard');
+    const waveCard=document.getElementById('waveCard'), momentsCard=document.getElementById('momentsCard');
+    const statsCard=document.getElementById('statsCard');
+    const dbValue=document.getElementById('dbValue'), dbLabel=document.getElementById('dbLabel');
+    const barFill=document.getElementById('barFill'), barPeak=document.getElementById('barPeak');
+    const barRecordMarker=document.getElementById('barRecordMarker');
+    const statMin=document.getElementById('statMin'), statAvg=document.getElementById('statAvg'), statMax=document.getElementById('statMax');
+    const peakRecordDb=document.getElementById('peakRecordDb'), peakRecordTime=document.getElementById('peakRecordTime');
+    const peakRecord=document.getElementById('peakRecord');
+    const achList=document.getElementById('achList'), momentsList=document.getElementById('momentsList');
+    const snapListEl=document.getElementById('snapList'), snapCountEl=document.getElementById('snapCount');
+    const snapDetail=document.getElementById('snapDetail');
+    const gaugeCanvas=document.getElementById('gaugeCanvas'), gaugeCtx=gaugeCanvas.getContext('2d');
+    const waveCanvas=document.getElementById('waveCanvas'), waveCtx=waveCanvas.getContext('2d');
 
     // ── State ──
-    let audioCtx, analyser, source, stream;
-    let listening = false;
-    let animId;
-    let peakDb = 0, peakDecay = 0;
-    let currentDb = 0;
-    let sessionMin = Infinity, sessionMax = -Infinity, sessionSum = 0, sessionCount = 0;
-    let sessionStartTime = null;
+    let audioCtx, analyser, source, stream, listening=false, animId;
+    let peakDb=0, peakDecay=0, currentDb=0;
+    let sessionMin=Infinity, sessionMax=-Infinity, sessionSum=0, sessionCount=0, sessionStartTime=null;
+    let allTimeRecord=parseInt(localStorage.getItem('db_record')||'0',10);
+    let allTimeRecordTime=localStorage.getItem('db_record_time')||'';
+    let moments=JSON.parse(localStorage.getItem('db_moments')||'[]');
+    let snapshots=JSON.parse(localStorage.getItem('db_snapshots')||'[]');
 
-    // All-time record
-    let allTimeRecord     = parseInt(localStorage.getItem('db_record') || '0', 10);
-    let allTimeRecordTime = localStorage.getItem('db_record_time') || '';
-
-    // Moments log
-    let moments = JSON.parse(localStorage.getItem('db_moments') || '[]');
-
-    // Achievement tracking — each tracks the duration spent above threshold
-    const achievements = [
-      { db: 30,  icon: '😊', name: 'Polite Interest',    desc: 'Audience is paying attention' },
-      { db: 50,  icon: '👏', name: 'Solid Applause',     desc: 'Genuine clapping & chatter' },
-      { db: 70,  icon: '🎉', name: 'Crowd Buzz',         desc: 'Room is alive with energy' },
-      { db: 85,  icon: '🔥', name: 'On Fire!',           desc: 'People are really into it' },
-      { db: 100, icon: '🤩', name: 'Standing Ovation',   desc: 'The crowd is losing it' },
-      { db: 110, icon: '📣', name: 'Stadium Roar',       desc: 'Deafening cheers' },
-      { db: 120, icon: '🚨', name: 'Ear Splitting',      desc: 'Threshold of pain reached' },
-      { db: 130, icon: '✈️', name: 'Jet Engine',         desc: 'Louder than a takeoff' },
-      { db: 140, icon: '🚀', name: 'Rocket Launch',      desc: 'Beyond belief' },
-      { db: 150, icon: '💥', name: 'LEGENDARY',          desc: 'Maximum crowd excitement!' },
+    const achievements=[
+      {db:30,icon:'😊',name:'Polite Interest',desc:'Audience is paying attention'},
+      {db:50,icon:'👏',name:'Solid Applause',desc:'Genuine clapping & chatter'},
+      {db:70,icon:'🎉',name:'Crowd Buzz',desc:'Room is alive with energy'},
+      {db:85,icon:'🔥',name:'On Fire!',desc:'People are really into it'},
+      {db:100,icon:'🤩',name:'Standing Ovation',desc:'The crowd is losing it'},
+      {db:110,icon:'📣',name:'Stadium Roar',desc:'Deafening cheers'},
+      {db:120,icon:'🚨',name:'Ear Splitting',desc:'Threshold of pain reached'},
+      {db:130,icon:'✈️',name:'Jet Engine',desc:'Louder than a takeoff'},
+      {db:140,icon:'🚀',name:'Rocket Launch',desc:'Beyond belief'},
+      {db:150,icon:'💥',name:'LEGENDARY',desc:'Maximum crowd excitement!'},
     ];
 
-    // Duration tracking: how many seconds spent above each threshold
-    let achDurations = JSON.parse(localStorage.getItem('db_ach_durations') || '{}');
-    let achMaxStreaks = JSON.parse(localStorage.getItem('db_ach_max_streaks') || '{}');
-    let achCurrentStreaks = {};
-    const FRAME_DUR = 1 / 60; // approx seconds per frame
+    let achDurations=JSON.parse(localStorage.getItem('db_ach_durations')||'{}');
+    let achMaxStreaks=JSON.parse(localStorage.getItem('db_ach_max_streaks')||'{}');
+    let achCurrentStreaks={};
+    const FRAME_DUR=1/60;
 
     // ── Helpers ──
-    function getLevel(db) {
-      if (db < 30)  return { color: 'var(--green)',  label: 'Calm' };
-      if (db < 60)  return { color: 'var(--green)',  label: 'Light Chatter' };
-      if (db < 80)  return { color: 'var(--yellow)', label: 'Engaged' };
-      if (db < 100) return { color: 'var(--orange)', label: 'Excited!' };
-      if (db < 120) return { color: 'var(--red)',    label: 'Going Wild!' };
-      return { color: '#dc2626', label: 'OFF THE CHARTS!' };
+    function getLevel(db){
+      if(db<30) return{color:'var(--green)',label:'Calm'};
+      if(db<60) return{color:'var(--green)',label:'Light Chatter'};
+      if(db<80) return{color:'var(--yellow)',label:'Engaged'};
+      if(db<100) return{color:'var(--orange)',label:'Excited!'};
+      if(db<120) return{color:'var(--red)',label:'Going Wild!'};
+      return{color:'#dc2626',label:'OFF THE CHARTS!'};
+    }
+    function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+    function timeStr(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+    function dateStr(){return new Date().toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});}
+    function fmtDur(sec){
+      if(sec<1) return '<1s';
+      if(sec<60) return Math.round(sec)+'s';
+      const m=Math.floor(sec/60),s=Math.round(sec%60);
+      return m+'m '+s+'s';
     }
 
-    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-    function timeStr() { return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }); }
+    // ═══════════════════════════════════════
+    // SIDEBAR — Snapshot Management
+    // ═══════════════════════════════════════
 
-    function fmtDur(sec) {
-      if (sec < 1) return '<1s';
-      if (sec < 60) return Math.round(sec) + 's';
-      const m = Math.floor(sec / 60);
-      const s = Math.round(sec % 60);
-      return m + 'm ' + s + 's';
+    function renderSnapshots() {
+      snapCountEl.textContent = snapshots.length;
+      if (snapshots.length === 0) {
+        snapListEl.innerHTML = '<div class="snap-empty">No snapshots yet.<br>Run a session, then hit<br>"📸 Save & Reset"<br>to save it here.</div>';
+        return;
+      }
+      snapListEl.innerHTML = '';
+      snapshots.forEach((s, i) => {
+        const item = document.createElement('div');
+        item.className = 'snap-item';
+        item.dataset.idx = i;
+        const level = getLevel(s.record.db);
+        item.innerHTML = `
+          <div class="snap-name">${s.name}</div>
+          <div class="snap-meta">
+            <span class="snap-peak" style="color:${level.color}">🏆 ${s.record.db} dB</span>
+            <span>${s.date || ''}</span>
+            <button class="snap-delete" data-idx="${i}" title="Delete snapshot">✕</button>
+          </div>
+        `;
+        item.addEventListener('click', (e) => {
+          if (e.target.classList.contains('snap-delete')) return;
+          showSnapshotDetail(i);
+          document.querySelectorAll('.snap-item').forEach(el => el.classList.remove('active'));
+          item.classList.add('active');
+        });
+        snapListEl.appendChild(item);
+      });
+
+      // Delete handlers
+      snapListEl.querySelectorAll('.snap-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const idx = parseInt(btn.dataset.idx, 10);
+          if (confirm('Delete "' + snapshots[idx].name + '"?')) {
+            snapshots.splice(idx, 1);
+            localStorage.setItem('db_snapshots', JSON.stringify(snapshots));
+            renderSnapshots();
+            snapDetail.classList.remove('visible');
+            snapDetail.innerHTML = '';
+          }
+        });
+      });
+    }
+
+    function showSnapshotDetail(idx) {
+      const s = snapshots[idx];
+      const level = getLevel(s.record.db);
+      let momentsHtml = '';
+      if (s.moments && s.moments.length > 0) {
+        const sorted = [...s.moments].sort((a,b) => b.db - a.db);
+        momentsHtml = `
+          <div class="snap-detail-moments">
+            <div class="snap-detail-moments-title">Logged Moments (${sorted.length})</div>
+            ${sorted.map(m => `
+              <div class="snap-moment-item">
+                <span class="snap-moment-db" style="color:${getLevel(m.db).color}">${m.db} dB</span>
+                <span class="snap-moment-label">${m.label || '(unnamed)'}</span>
+                <span class="snap-moment-time">${m.time}</span>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      let achHtml = '';
+      if (s.achievements) {
+        achHtml = `
+          <div class="snap-detail-achs">
+            <div class="snap-detail-achs-title">Achievements</div>
+            ${s.achievements.map(a => `
+              <span class="snap-ach-item ${a.achieved ? '' : 'locked'}">
+                ${achievements.find(x=>x.db===a.db)?.icon||''} ${a.name} ${a.achieved ? '✅' : '⬜'}
+                ${a.achieved && a.totalDuration ? `<span style="color:var(--gold);font-size:0.72rem;margin-left:0.3rem">${fmtDur(a.totalDuration)}</span>` : ''}
+              </span>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      snapDetail.innerHTML = `
+        <div class="snap-detail-banner">
+          <div class="snap-detail-top">
+            <div class="snap-detail-title">📸 ${s.name}</div>
+            <button class="snap-detail-close" id="closeSnapDetail">✕ Close</button>
+          </div>
+          <div class="snap-detail-stats">
+            <div class="snap-detail-stat">
+              <div class="val" style="color:${level.color}">${s.record.db}</div>
+              <div class="lbl">Peak dB</div>
+            </div>
+            ${s.sessionStats?.avg != null ? `<div class="snap-detail-stat"><div class="val">${s.sessionStats.avg}</div><div class="lbl">Avg dB</div></div>` : ''}
+            ${s.sessionStats?.min != null ? `<div class="snap-detail-stat"><div class="val">${s.sessionStats.min}</div><div class="lbl">Min dB</div></div>` : ''}
+            ${s.moments ? `<div class="snap-detail-stat"><div class="val">${s.moments.length}</div><div class="lbl">Moments</div></div>` : ''}
+            ${s.date ? `<div class="snap-detail-stat"><div class="val" style="font-size:1rem">${s.date}</div><div class="lbl">Date</div></div>` : ''}
+          </div>
+          ${momentsHtml}
+          ${achHtml}
+        </div>
+      `;
+      snapDetail.classList.add('visible');
+      document.getElementById('closeSnapDetail').addEventListener('click', () => {
+        snapDetail.classList.remove('visible');
+        snapDetail.innerHTML = '';
+        document.querySelectorAll('.snap-item').forEach(el => el.classList.remove('active'));
+      });
     }
 
     // ── Render Achievements (biggest first) ──
-    function renderAchievements() {
-      achList.innerHTML = '';
-      [...achievements].reverse().forEach(a => {
-        const hit = allTimeRecord >= a.db;
-        const totalDur = achDurations[a.db] || 0;
-        const maxStreak = achMaxStreaks[a.db] || 0;
-        const row = document.createElement('div');
-        row.className = 'ach-row' + (hit ? ' achieved' : '');
-        row.innerHTML = `
+    function renderAchievements(){
+      achList.innerHTML='';
+      [...achievements].reverse().forEach(a=>{
+        const hit=allTimeRecord>=a.db;
+        const totalDur=achDurations[a.db]||0;
+        const maxStreak=achMaxStreaks[a.db]||0;
+        const row=document.createElement('div');
+        row.className='ach-row'+(hit?' achieved':'');
+        row.innerHTML=`
           <div class="ach-icon">${a.icon}</div>
-          <div class="ach-info">
-            <div class="ach-name">${a.name}</div>
-            <div class="ach-desc">${a.desc}</div>
-          </div>
+          <div class="ach-info"><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div></div>
           <div class="ach-right">
             <div class="ach-target">${a.db} dB</div>
-            ${hit ? `<div class="ach-duration">Total: ${fmtDur(totalDur)} | Best: ${fmtDur(maxStreak)}</div>` : ''}
+            ${hit?`<div class="ach-duration">Total: ${fmtDur(totalDur)} | Best: ${fmtDur(maxStreak)}</div>`:''}
           </div>
-          <div class="ach-check">${hit ? '✅' : '⬜'}</div>
-        `;
+          <div class="ach-check">${hit?'✅':'⬜'}</div>`;
         achList.appendChild(row);
       });
     }
 
     // ── Render Moments ──
-    function renderMoments() {
-      momentsList.innerHTML = '';
-      if (moments.length === 0) {
-        momentsList.innerHTML = '<div class="no-moments">Hit "📌 Log Moment" during peaks to capture what the audience is reacting to!</div>';
-        return;
-      }
-      const sorted = [...moments].sort((a, b) => b.db - a.db);
-      sorted.forEach((m, i) => {
-        const rankClass = i === 0 ? 'r1' : i === 1 ? 'r2' : i === 2 ? 'r3' : '';
-        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`;
-        const level = getLevel(m.db);
-        const row = document.createElement('div');
-        row.className = 'moment-row';
-
-        if (m.editing) {
-          row.innerHTML = `
-            <span class="moment-rank ${rankClass}">${medal}</span>
-            <span class="moment-db" style="color:${level.color}">${m.db} dB</span>
-            <input class="moment-input" type="text" placeholder="What happened?" value="${m.label || ''}" data-idx="${moments.indexOf(m)}" />
+    function renderMoments(){
+      momentsList.innerHTML='';
+      if(!moments.length){momentsList.innerHTML='<div class="no-moments">Hit "📌 Log Moment" during peaks to capture what the audience is reacting to!</div>';return;}
+      const sorted=[...moments].sort((a,b)=>b.db-a.db);
+      sorted.forEach((m,i)=>{
+        const rc=i===0?'r1':i===1?'r2':i===2?'r3':'';
+        const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+        const lv=getLevel(m.db);
+        const row=document.createElement('div');
+        row.className='moment-row';
+        if(m.editing){
+          row.innerHTML=`<span class="moment-rank ${rc}">${medal}</span><span class="moment-db" style="color:${lv.color}">${m.db} dB</span>
+            <input class="moment-input" type="text" placeholder="What happened?" value="${m.label||''}" data-idx="${moments.indexOf(m)}"/>
             <button class="moment-save-btn" data-idx="${moments.indexOf(m)}">Save</button>
-            <span class="moment-time">${m.time}</span>
-          `;
+            <span class="moment-time">${m.time}</span>`;
         } else {
-          row.innerHTML = `
-            <span class="moment-rank ${rankClass}">${medal}</span>
-            <span class="moment-db" style="color:${level.color}">${m.db} dB</span>
-            <span class="moment-dur">${fmtDur(m.duration || 0)}</span>
-            <span class="moment-label">${m.label || '(unnamed moment)'}</span>
-            <span class="moment-time">${m.time}</span>
-          `;
+          row.innerHTML=`<span class="moment-rank ${rc}">${medal}</span><span class="moment-db" style="color:${lv.color}">${m.db} dB</span>
+            <span class="moment-dur">${fmtDur(m.duration||0)}</span>
+            <span class="moment-label">${m.label||'(unnamed moment)'}</span>
+            <span class="moment-time">${m.time}</span>`;
         }
         momentsList.appendChild(row);
       });
-
-      // Attach save handlers
-      momentsList.querySelectorAll('.moment-save-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const idx = parseInt(btn.dataset.idx, 10);
-          const input = momentsList.querySelector(`input[data-idx="${idx}"]`);
-          if (input) {
-            moments[idx].label = input.value || '(unnamed moment)';
-            moments[idx].editing = false;
-            localStorage.setItem('db_moments', JSON.stringify(moments));
-            renderMoments();
-          }
+      momentsList.querySelectorAll('.moment-save-btn').forEach(btn=>{
+        btn.addEventListener('click',()=>{
+          const idx=parseInt(btn.dataset.idx,10);
+          const input=momentsList.querySelector(`input[data-idx="${idx}"]`);
+          if(input){moments[idx].label=input.value||'(unnamed moment)';moments[idx].editing=false;localStorage.setItem('db_moments',JSON.stringify(moments));renderMoments();}
         });
       });
-      momentsList.querySelectorAll('.moment-input').forEach(input => {
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            const idx = parseInt(input.dataset.idx, 10);
-            moments[idx].label = input.value || '(unnamed moment)';
-            moments[idx].editing = false;
-            localStorage.setItem('db_moments', JSON.stringify(moments));
-            renderMoments();
-          }
+      momentsList.querySelectorAll('.moment-input').forEach(input=>{
+        input.addEventListener('keydown',e=>{
+          if(e.key==='Enter'){const idx=parseInt(input.dataset.idx,10);moments[idx].label=input.value||'(unnamed moment)';moments[idx].editing=false;localStorage.setItem('db_moments',JSON.stringify(moments));renderMoments();}
         });
       });
     }
 
-    // ── Log Moment button ──
-    logMomentBtn.addEventListener('click', () => {
-      if (!listening) return;
-      const elapsed = sessionStartTime ? Math.round((Date.now() - sessionStartTime) / 1000) : 0;
-      moments.push({
-        db: currentDb,
-        time: timeStr(),
-        elapsed,
-        duration: achCurrentStreaks[Math.floor(currentDb / 10) * 10] || 0,
-        label: '',
-        editing: true,
-      });
-      localStorage.setItem('db_moments', JSON.stringify(moments));
+    // ── Log Moment ──
+    logMomentBtn.addEventListener('click',()=>{
+      if(!listening)return;
+      moments.push({db:currentDb,time:timeStr(),elapsed:sessionStartTime?Math.round((Date.now()-sessionStartTime)/1000):0,duration:achCurrentStreaks[Math.floor(currentDb/10)*10]||0,label:'',editing:true});
+      localStorage.setItem('db_moments',JSON.stringify(moments));
       renderMoments();
-      // Focus the new input
-      setTimeout(() => {
-        const inputs = momentsList.querySelectorAll('.moment-input');
-        if (inputs.length) inputs[inputs.length - 1].focus();
-      }, 50);
+      setTimeout(()=>{const inputs=momentsList.querySelectorAll('.moment-input');if(inputs.length)inputs[inputs.length-1].focus();},50);
     });
 
-    // ── Update Record ──
-    function checkRecord(db) {
-      if (db <= 0) return;
-
-      if (db > allTimeRecord) {
-        allTimeRecord = db;
-        allTimeRecordTime = timeStr();
-        localStorage.setItem('db_record', String(allTimeRecord));
-        localStorage.setItem('db_record_time', allTimeRecordTime);
-
-        peakRecord.classList.remove('flash');
-        void peakRecord.offsetWidth;
-        peakRecord.classList.add('flash');
-        peakCard.classList.remove('flash-card');
-        void peakCard.offsetWidth;
-        peakCard.classList.add('flash-card');
-
-        renderAchievements();
-      }
-
-      peakRecordDb.textContent = allTimeRecord;
-      peakRecordTime.textContent = allTimeRecordTime ? `Set at ${allTimeRecordTime}` : 'Make some noise!';
-      barRecordMarker.style.left = ((allTimeRecord / MAX_DB) * 100) + '%';
+    // ── Records & Durations ──
+    function checkRecord(db){
+      if(db<=0)return;
+      if(db>allTimeRecord){allTimeRecord=db;allTimeRecordTime=timeStr();localStorage.setItem('db_record',String(allTimeRecord));localStorage.setItem('db_record_time',allTimeRecordTime);peakRecord.classList.remove('flash');void peakRecord.offsetWidth;peakRecord.classList.add('flash');peakCard.classList.remove('flash-card');void peakCard.offsetWidth;peakCard.classList.add('flash-card');renderAchievements();}
+      peakRecordDb.textContent=allTimeRecord;peakRecordTime.textContent=allTimeRecordTime?`Set at ${allTimeRecordTime}`:'Make some noise!';barRecordMarker.style.left=((allTimeRecord/MAX_DB)*100)+'%';
     }
 
-    // ── Update Achievement Durations ──
-    function updateAchDurations(db) {
-      achievements.forEach(a => {
-        if (db >= a.db) {
-          // Increment total duration
-          achDurations[a.db] = (achDurations[a.db] || 0) + FRAME_DUR;
-          // Increment current streak
-          achCurrentStreaks[a.db] = (achCurrentStreaks[a.db] || 0) + FRAME_DUR;
-          // Track max streak
-          if ((achCurrentStreaks[a.db] || 0) > (achMaxStreaks[a.db] || 0)) {
-            achMaxStreaks[a.db] = achCurrentStreaks[a.db];
-          }
-        } else {
-          // Reset current streak
-          achCurrentStreaks[a.db] = 0;
-        }
-      });
-      // Persist occasionally (every ~2 seconds)
-      if (sessionCount % 120 === 0) {
-        localStorage.setItem('db_ach_durations', JSON.stringify(achDurations));
-        localStorage.setItem('db_ach_max_streaks', JSON.stringify(achMaxStreaks));
-      }
+    function updateAchDurations(db){
+      achievements.forEach(a=>{if(db>=a.db){achDurations[a.db]=(achDurations[a.db]||0)+FRAME_DUR;achCurrentStreaks[a.db]=(achCurrentStreaks[a.db]||0)+FRAME_DUR;if((achCurrentStreaks[a.db]||0)>(achMaxStreaks[a.db]||0))achMaxStreaks[a.db]=achCurrentStreaks[a.db];}else{achCurrentStreaks[a.db]=0;}});
+      if(sessionCount%120===0){localStorage.setItem('db_ach_durations',JSON.stringify(achDurations));localStorage.setItem('db_ach_max_streaks',JSON.stringify(achMaxStreaks));}
     }
 
-    // ── Gauge Drawing ──
-    function drawGauge(db) {
-      const W = gaugeCanvas.width;
-      const H = gaugeCanvas.height;
-      const cx = W / 2;
-      const cy = H - 20;
-      const radius = Math.min(cx, cy) - 30;
-
-      gaugeCtx.clearRect(0, 0, W, H);
-
-      const startAngle = Math.PI;
-      const segments = [
-        { end: 0.20, color: '#22c55e' },
-        { end: 0.40, color: '#84cc16' },
-        { end: 0.53, color: '#eab308' },
-        { end: 0.67, color: '#f97316' },
-        { end: 0.80, color: '#ef4444' },
-        { end: 1.00, color: '#dc2626' },
-      ];
-
-      let prevFrac = 0;
-      segments.forEach(seg => {
-        gaugeCtx.beginPath();
-        gaugeCtx.arc(cx, cy, radius, startAngle + prevFrac * Math.PI, startAngle + seg.end * Math.PI);
-        gaugeCtx.lineWidth = 22;
-        gaugeCtx.strokeStyle = seg.color;
-        gaugeCtx.lineCap = 'butt';
-        gaugeCtx.globalAlpha = 0.25;
-        gaugeCtx.stroke();
-        prevFrac = seg.end;
-      });
-
-      const fraction = clamp(db / MAX_DB, 0, 1);
-      prevFrac = 0;
-      segments.forEach(seg => {
-        if (fraction > prevFrac) {
-          gaugeCtx.beginPath();
-          gaugeCtx.arc(cx, cy, radius, startAngle + prevFrac * Math.PI, startAngle + Math.min(fraction, seg.end) * Math.PI);
-          gaugeCtx.lineWidth = 22;
-          gaugeCtx.strokeStyle = seg.color;
-          gaugeCtx.globalAlpha = 1;
-          gaugeCtx.stroke();
-        }
-        prevFrac = seg.end;
-      });
-
-      gaugeCtx.globalAlpha = 1;
-
-      for (let i = 0; i <= 15; i++) {
-        const angle = startAngle + (i / 15) * Math.PI;
-        const isMajor = i % 3 === 0;
-        const innerR = radius - (isMajor ? 32 : 26);
-        const outerR = radius - 16;
-        gaugeCtx.beginPath();
-        gaugeCtx.moveTo(cx + innerR * Math.cos(angle), cy + innerR * Math.sin(angle));
-        gaugeCtx.lineTo(cx + outerR * Math.cos(angle), cy + outerR * Math.sin(angle));
-        gaugeCtx.strokeStyle = isMajor ? '#94a3b8' : '#475569';
-        gaugeCtx.lineWidth = isMajor ? 2 : 1;
-        gaugeCtx.stroke();
-        if (isMajor) {
-          const labelR = innerR - 14;
-          gaugeCtx.fillStyle = '#94a3b8';
-          gaugeCtx.font = '600 13px system-ui';
-          gaugeCtx.textAlign = 'center';
-          gaugeCtx.textBaseline = 'middle';
-          gaugeCtx.fillText(String(i * 10), cx + labelR * Math.cos(angle), cy + labelR * Math.sin(angle));
-        }
-      }
-
-      // Record marker
-      if (allTimeRecord > 0) {
-        const recAngle = startAngle + (allTimeRecord / MAX_DB) * Math.PI;
-        gaugeCtx.beginPath();
-        gaugeCtx.arc(cx + (radius + 2) * Math.cos(recAngle), cy + (radius + 2) * Math.sin(recAngle), 5, 0, Math.PI * 2);
-        gaugeCtx.fillStyle = '#fbbf24';
-        gaugeCtx.shadowColor = 'rgba(251,191,36,0.6)';
-        gaugeCtx.shadowBlur = 10;
-        gaugeCtx.fill();
-        gaugeCtx.shadowBlur = 0;
-      }
-
-      // Needle
-      const needleAngle = startAngle + fraction * Math.PI;
-      gaugeCtx.save();
-      gaugeCtx.translate(cx, cy);
-      gaugeCtx.rotate(needleAngle);
-      gaugeCtx.beginPath();
-      gaugeCtx.moveTo(0, -3);
-      gaugeCtx.lineTo(radius - 38, 0);
-      gaugeCtx.lineTo(0, 3);
-      gaugeCtx.closePath();
-      gaugeCtx.fillStyle = '#f8fafc';
-      gaugeCtx.shadowColor = 'rgba(255,255,255,0.3)';
-      gaugeCtx.shadowBlur = 8;
-      gaugeCtx.fill();
-      gaugeCtx.restore();
-
-      gaugeCtx.beginPath();
-      gaugeCtx.arc(cx, cy, 7, 0, Math.PI * 2);
-      gaugeCtx.fillStyle = '#e2e8f0';
-      gaugeCtx.fill();
+    // ── Gauge ──
+    function drawGauge(db){
+      const W=gaugeCanvas.width,H=gaugeCanvas.height,cx=W/2,cy=H-20,radius=Math.min(cx,cy)-30;
+      gaugeCtx.clearRect(0,0,W,H);
+      const sa=Math.PI,segs=[{end:.20,color:'#22c55e'},{end:.40,color:'#84cc16'},{end:.53,color:'#eab308'},{end:.67,color:'#f97316'},{end:.80,color:'#ef4444'},{end:1,color:'#dc2626'}];
+      let pf=0;segs.forEach(s=>{gaugeCtx.beginPath();gaugeCtx.arc(cx,cy,radius,sa+pf*Math.PI,sa+s.end*Math.PI);gaugeCtx.lineWidth=22;gaugeCtx.strokeStyle=s.color;gaugeCtx.lineCap='butt';gaugeCtx.globalAlpha=.25;gaugeCtx.stroke();pf=s.end;});
+      const fr=clamp(db/MAX_DB,0,1);pf=0;segs.forEach(s=>{if(fr>pf){gaugeCtx.beginPath();gaugeCtx.arc(cx,cy,radius,sa+pf*Math.PI,sa+Math.min(fr,s.end)*Math.PI);gaugeCtx.lineWidth=22;gaugeCtx.strokeStyle=s.color;gaugeCtx.globalAlpha=1;gaugeCtx.stroke();}pf=s.end;});
+      gaugeCtx.globalAlpha=1;
+      for(let i=0;i<=15;i++){const a=sa+(i/15)*Math.PI,maj=i%3===0,ir=radius-(maj?32:26),or=radius-16;gaugeCtx.beginPath();gaugeCtx.moveTo(cx+ir*Math.cos(a),cy+ir*Math.sin(a));gaugeCtx.lineTo(cx+or*Math.cos(a),cy+or*Math.sin(a));gaugeCtx.strokeStyle=maj?'#94a3b8':'#475569';gaugeCtx.lineWidth=maj?2:1;gaugeCtx.stroke();if(maj){const lr=ir-14;gaugeCtx.fillStyle='#94a3b8';gaugeCtx.font='600 13px system-ui';gaugeCtx.textAlign='center';gaugeCtx.textBaseline='middle';gaugeCtx.fillText(String(i*10),cx+lr*Math.cos(a),cy+lr*Math.sin(a));}}
+      if(allTimeRecord>0){const ra=sa+(allTimeRecord/MAX_DB)*Math.PI;gaugeCtx.beginPath();gaugeCtx.arc(cx+(radius+2)*Math.cos(ra),cy+(radius+2)*Math.sin(ra),5,0,Math.PI*2);gaugeCtx.fillStyle='#fbbf24';gaugeCtx.shadowColor='rgba(251,191,36,0.6)';gaugeCtx.shadowBlur=10;gaugeCtx.fill();gaugeCtx.shadowBlur=0;}
+      const na=sa+fr*Math.PI;gaugeCtx.save();gaugeCtx.translate(cx,cy);gaugeCtx.rotate(na);gaugeCtx.beginPath();gaugeCtx.moveTo(0,-3);gaugeCtx.lineTo(radius-38,0);gaugeCtx.lineTo(0,3);gaugeCtx.closePath();gaugeCtx.fillStyle='#f8fafc';gaugeCtx.shadowColor='rgba(255,255,255,0.3)';gaugeCtx.shadowBlur=8;gaugeCtx.fill();gaugeCtx.restore();
+      gaugeCtx.beginPath();gaugeCtx.arc(cx,cy,7,0,Math.PI*2);gaugeCtx.fillStyle='#e2e8f0';gaugeCtx.fill();
     }
 
     // ── Waveform ──
-    function drawWaveform(dataArray) {
-      const W = waveCanvas.width, H = waveCanvas.height;
-      waveCtx.clearRect(0, 0, W, H);
-      const grad = waveCtx.createLinearGradient(0, 0, W, 0);
-      grad.addColorStop(0, '#3b82f6');
-      grad.addColorStop(0.5, '#a78bfa');
-      grad.addColorStop(1, '#3b82f6');
-      waveCtx.beginPath();
-      const sw = W / dataArray.length;
-      let x = 0;
-      for (let i = 0; i < dataArray.length; i++) {
-        const y = (dataArray[i] / 128.0 * H) / 2;
-        i === 0 ? waveCtx.moveTo(x, y) : waveCtx.lineTo(x, y);
-        x += sw;
-      }
-      waveCtx.strokeStyle = grad;
-      waveCtx.lineWidth = 2;
-      waveCtx.stroke();
-      waveCtx.globalAlpha = 0.3;
-      waveCtx.stroke();
-      waveCtx.globalAlpha = 1;
+    function drawWaveform(d){
+      const W=waveCanvas.width,H=waveCanvas.height;waveCtx.clearRect(0,0,W,H);
+      const g=waveCtx.createLinearGradient(0,0,W,0);g.addColorStop(0,'#3b82f6');g.addColorStop(.5,'#a78bfa');g.addColorStop(1,'#3b82f6');
+      waveCtx.beginPath();const sw=W/d.length;let x=0;for(let i=0;i<d.length;i++){const y=(d[i]/128*H)/2;i===0?waveCtx.moveTo(x,y):waveCtx.lineTo(x,y);x+=sw;}
+      waveCtx.strokeStyle=g;waveCtx.lineWidth=2;waveCtx.stroke();waveCtx.globalAlpha=.3;waveCtx.stroke();waveCtx.globalAlpha=1;
     }
 
     // ── Main Loop ──
-    function loop() {
-      if (!listening) return;
-
-      const dataArray = new Float32Array(analyser.fftSize);
-      analyser.getFloatTimeDomainData(dataArray);
-
-      let sumSq = 0;
-      for (let i = 0; i < dataArray.length; i++) sumSq += dataArray[i] * dataArray[i];
-      const rms = Math.sqrt(sumSq / dataArray.length);
-      let db = rms > 0.000001 ? 20 * Math.log10(rms) + 110 : 0;
-      db = clamp(Math.round(db), 0, MAX_DB);
-      currentDb = db;
-
-      if (db > peakDb) { peakDb = db; peakDecay = 0; }
-      else { peakDecay++; if (peakDecay > 40) peakDb = Math.max(peakDb - 0.5, db); }
-
-      if (db > 0) {
-        sessionMin = Math.min(sessionMin, db);
-        sessionMax = Math.max(sessionMax, db);
-        sessionSum += db;
-        sessionCount++;
-      }
-
-      checkRecord(db);
-      updateAchDurations(db);
-
-      // Render achievements every ~1s
-      if (sessionCount % 60 === 0) renderAchievements();
-
-      const level = getLevel(db);
-      dbValue.textContent = db;
-      dbValue.style.color = level.color;
-      dbLabel.textContent = level.label;
-      dbLabel.style.color = level.color;
-
-      barFill.style.width = (db / MAX_DB * 100) + '%';
-      barPeak.style.left = (peakDb / MAX_DB * 100) + '%';
-
+    function loop(){
+      if(!listening)return;
+      const d=new Float32Array(analyser.fftSize);analyser.getFloatTimeDomainData(d);
+      let sq=0;for(let i=0;i<d.length;i++)sq+=d[i]*d[i];
+      const rms=Math.sqrt(sq/d.length);let db=rms>0.000001?20*Math.log10(rms)+110:0;db=clamp(Math.round(db),0,MAX_DB);currentDb=db;
+      if(db>peakDb){peakDb=db;peakDecay=0;}else{peakDecay++;if(peakDecay>40)peakDb=Math.max(peakDb-.5,db);}
+      if(db>0){sessionMin=Math.min(sessionMin,db);sessionMax=Math.max(sessionMax,db);sessionSum+=db;sessionCount++;}
+      checkRecord(db);updateAchDurations(db);
+      if(sessionCount%60===0)renderAchievements();
+      const lv=getLevel(db);dbValue.textContent=db;dbValue.style.color=lv.color;dbLabel.textContent=lv.label;dbLabel.style.color=lv.color;
+      barFill.style.width=(db/MAX_DB*100)+'%';barPeak.style.left=(peakDb/MAX_DB*100)+'%';
       drawGauge(db);
-
-      const waveData = new Uint8Array(analyser.fftSize);
-      analyser.getByteTimeDomainData(waveData);
-      drawWaveform(waveData);
-
-      if (sessionCount > 0) {
-        statMin.textContent = sessionMin === Infinity ? '--' : sessionMin;
-        statAvg.textContent = Math.round(sessionSum / sessionCount);
-        statMax.textContent = sessionMax === -Infinity ? '--' : sessionMax;
-      }
-
-      animId = requestAnimationFrame(loop);
+      const wd=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(wd);drawWaveform(wd);
+      if(sessionCount>0){statMin.textContent=sessionMin===Infinity?'--':sessionMin;statAvg.textContent=Math.round(sessionSum/sessionCount);statMax.textContent=sessionMax===-Infinity?'--':sessionMax;}
+      animId=requestAnimationFrame(loop);
     }
 
     // ── Start / Stop ──
-    async function startListening() {
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }
-        });
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') await audioCtx.resume();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 4096;
-        analyser.smoothingTimeConstant = 0.2;
-        analyser.minDecibels = -127;
-        analyser.maxDecibels = 0;
-        source = audioCtx.createMediaStreamSource(stream);
-        source.connect(analyser);
-
-        listening = true;
-        sessionStartTime = Date.now();
-        startBtn.classList.add('listening');
-        btnText.textContent = 'Stop Listening';
-        logMomentBtn.style.display = 'block';
-        snapshotBtn.style.display = 'block';
-
-        [gaugeCard, peakCard, achCard, barCard, waveCard, momentsCard, statsCard].forEach(c => c.classList.remove('hidden'));
-
-        sessionMin = Infinity; sessionMax = -Infinity; sessionSum = 0; sessionCount = 0; peakDb = 0;
-        achCurrentStreaks = {};
-
-        renderAchievements();
-        renderMoments();
-        checkRecord(0);
-        loop();
-      } catch (err) {
-        alert('Microphone access is required.\n\n' + err.message);
-      }
+    async function startListening(){
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+        audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')await audioCtx.resume();
+        analyser=audioCtx.createAnalyser();analyser.fftSize=4096;analyser.smoothingTimeConstant=.2;analyser.minDecibels=-127;analyser.maxDecibels=0;
+        source=audioCtx.createMediaStreamSource(stream);source.connect(analyser);
+        listening=true;sessionStartTime=Date.now();
+        startBtn.classList.add('listening');btnText.textContent='Stop Listening';
+        logMomentBtn.style.display='block';snapshotBtn.style.display='block';
+        [gaugeCard,peakCard,achCard,barCard,waveCard,momentsCard,statsCard].forEach(c=>c.classList.remove('hidden'));
+        sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
+        renderAchievements();renderMoments();checkRecord(0);loop();
+      }catch(err){alert('Microphone access is required.\n\n'+err.message);}
     }
 
-    function stopListening() {
-      listening = false;
-      cancelAnimationFrame(animId);
-      if (source) source.disconnect();
-      if (stream) stream.getTracks().forEach(t => t.stop());
-      if (audioCtx) audioCtx.close();
-      startBtn.classList.remove('listening');
-      btnText.textContent = 'Start Listening';
-      logMomentBtn.style.display = 'none';
-      snapshotBtn.style.display = 'none';
-      // Final persist
-      localStorage.setItem('db_ach_durations', JSON.stringify(achDurations));
-      localStorage.setItem('db_ach_max_streaks', JSON.stringify(achMaxStreaks));
+    function stopListening(){
+      listening=false;cancelAnimationFrame(animId);
+      if(source)source.disconnect();if(stream)stream.getTracks().forEach(t=>t.stop());if(audioCtx)audioCtx.close();
+      startBtn.classList.remove('listening');btnText.textContent='Start Listening';
+      logMomentBtn.style.display='none';snapshotBtn.style.display='none';
+      localStorage.setItem('db_ach_durations',JSON.stringify(achDurations));
+      localStorage.setItem('db_ach_max_streaks',JSON.stringify(achMaxStreaks));
       renderAchievements();
     }
 
-    startBtn.addEventListener('click', () => {
-      if (listening) stopListening(); else startListening();
-    });
+    startBtn.addEventListener('click',()=>{if(listening)stopListening();else startListening();});
 
     // ── Snapshot & Clear ──
-    snapshotBtn.addEventListener('click', () => {
-      const confirmed = confirm(
-        '📸 Snapshot & New Session\n\n' +
-        'This will:\n' +
-        '• Save current data as a snapshot (downloaded as JSON)\n' +
-        '• Clear all records, achievements, and moments\n' +
-        '• Start fresh for a new celebration!\n\n' +
-        'Continue?'
-      );
-      if (!confirmed) return;
+    snapshotBtn.addEventListener('click',()=>{
+      const name=prompt('📸 Name this session:\n(e.g. "Product Launch Demo", "Q1 All-Hands")');
+      if(name===null)return; // cancelled
+      const sessionName=name.trim()||'Unnamed Session';
 
       // Build snapshot
-      const snapshot = {
+      const snapshot={
+        name: sessionName,
+        date: dateStr(),
         exportedAt: new Date().toISOString(),
-        record: { db: allTimeRecord, time: allTimeRecordTime },
-        achievements: achievements.map(a => ({
-          name: a.name,
-          db: a.db,
-          achieved: allTimeRecord >= a.db,
-          totalDuration: achDurations[a.db] || 0,
-          bestStreak: achMaxStreaks[a.db] || 0,
-        })),
-        moments: moments.map(m => ({ db: m.db, time: m.time, label: m.label, duration: m.duration || 0 })),
-        sessionStats: {
-          min: sessionMin === Infinity ? null : sessionMin,
-          avg: sessionCount > 0 ? Math.round(sessionSum / sessionCount) : null,
-          max: sessionMax === -Infinity ? null : sessionMax,
-        },
+        record:{db:allTimeRecord,time:allTimeRecordTime},
+        achievements:achievements.map(a=>({name:a.name,db:a.db,achieved:allTimeRecord>=a.db,totalDuration:achDurations[a.db]||0,bestStreak:achMaxStreaks[a.db]||0})),
+        moments:moments.map(m=>({db:m.db,time:m.time,label:m.label,duration:m.duration||0})),
+        sessionStats:{min:sessionMin===Infinity?null:sessionMin,avg:sessionCount>0?Math.round(sessionSum/sessionCount):null,max:sessionMax===-Infinity?null:sessionMax},
       };
 
-      // Download as JSON
-      const blob = new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'excitement-snapshot-' + new Date().toISOString().slice(0, 19).replace(/[T:]/g, '-') + '.json';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      // Save to sidebar
+      snapshots.unshift(snapshot);
+      localStorage.setItem('db_snapshots',JSON.stringify(snapshots));
+      renderSnapshots();
 
-      // Clear all persisted data
-      allTimeRecord = 0;
-      allTimeRecordTime = '';
-      moments = [];
-      achDurations = {};
-      achMaxStreaks = {};
-      achCurrentStreaks = {};
-      topPeaks = [];
-      localStorage.removeItem('db_record');
-      localStorage.removeItem('db_record_time');
-      localStorage.removeItem('db_moments');
-      localStorage.removeItem('db_ach_durations');
-      localStorage.removeItem('db_ach_max_streaks');
-      localStorage.removeItem('db_top_peaks');
+      // Clear all live data
+      allTimeRecord=0;allTimeRecordTime='';moments=[];achDurations={};achMaxStreaks={};achCurrentStreaks={};
+      localStorage.removeItem('db_record');localStorage.removeItem('db_record_time');localStorage.removeItem('db_moments');
+      localStorage.removeItem('db_ach_durations');localStorage.removeItem('db_ach_max_streaks');
 
-      // Reset session stats
-      sessionMin = Infinity;
-      sessionMax = -Infinity;
-      sessionSum = 0;
-      sessionCount = 0;
-      peakDb = 0;
-
-      // Re-render everything
-      peakRecordDb.textContent = '--';
-      peakRecordTime.textContent = 'Make some noise!';
-      barRecordMarker.style.left = '0%';
-      statMin.textContent = '--';
-      statAvg.textContent = '--';
-      statMax.textContent = '--';
-      renderAchievements();
-      renderMoments();
+      sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;
+      peakRecordDb.textContent='--';peakRecordTime.textContent='Make some noise!';barRecordMarker.style.left='0%';
+      statMin.textContent='--';statAvg.textContent='--';statMax.textContent='--';
+      renderAchievements();renderMoments();
     });
+
+    // ── Init ──
+    renderSnapshots();
   </script>
 </body>
 </html>
