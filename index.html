@@ -230,87 +230,168 @@
     }
     #snapshotBtn:hover { background: rgba(99, 102, 241, 0.1); }
 
-    /* ── Snapshot Detail Overlay ── */
-    .snap-detail-overlay {
-      display: none;
-    }
-    .snap-detail-overlay.visible {
-      display: block;
-    }
+    /* ── Snapshot Detail Modal ── */
+    .snap-detail-overlay { display: none; }
+    .snap-detail-overlay.visible { display: block; }
 
     .snap-detail-banner {
-      background: linear-gradient(135deg, #1e1b4b, #312e81);
-      border: 1px solid #4338ca;
-      border-radius: 14px;
-      padding: 1.2rem 1.5rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
       margin-bottom: 0.5rem;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Header with gradient */
+    .snap-detail-header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+      padding: 1.3rem 1.5rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .snap-detail-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(251,191,36,0.12) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     .snap-detail-top {
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .snap-detail-title-wrap {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .snap-detail-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #818cf8;
+      margin-bottom: 0.2rem;
     }
 
     .snap-detail-title {
-      font-size: 1.1rem;
-      font-weight: 700;
+      font-size: 1.3rem;
+      font-weight: 800;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .snap-detail-date {
+      font-size: 0.8rem;
+      color: #a5b4fc;
+      margin-top: 0.15rem;
     }
 
     .snap-detail-close {
-      background: rgba(255,255,255,0.1);
-      border: none;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
       color: var(--text);
       cursor: pointer;
-      padding: 0.3rem 0.6rem;
-      border-radius: 6px;
+      padding: 0.4rem 0.7rem;
+      border-radius: 8px;
       font-size: 0.85rem;
+      font-weight: 600;
+      transition: background 0.15s;
+      flex-shrink: 0;
     }
-    .snap-detail-close:hover { background: rgba(255,255,255,0.2); }
+    .snap-detail-close:hover { background: rgba(255,255,255,0.15); }
 
+    /* Stats Grid */
     .snap-detail-stats {
-      display: flex;
-      gap: 1.5rem;
-      margin-top: 0.8rem;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.6rem;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
     }
 
     .snap-detail-stat {
       text-align: center;
+      padding: 0.7rem 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
     }
 
     .snap-detail-stat .val {
-      font-size: 1.5rem;
-      font-weight: 800;
+      font-size: 1.6rem;
+      font-weight: 900;
       font-variant-numeric: tabular-nums;
+      line-height: 1.1;
     }
 
     .snap-detail-stat .lbl {
-      font-size: 0.7rem;
-      color: #a5b4fc;
+      font-size: 0.65rem;
+      color: var(--muted);
       text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.2rem;
     }
 
-    .snap-detail-moments {
-      margin-top: 0.8rem;
+    /* Moments Section */
+    .snap-detail-section {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .snap-detail-section:last-child { border-bottom: none; }
+
+    .snap-section-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
-    .snap-detail-moments-title {
-      font-size: 0.75rem;
-      color: #a5b4fc;
-      text-transform: uppercase;
-      margin-bottom: 0.4rem;
+    .snap-section-badge {
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.6rem;
+      padding: 0.1rem 0.4rem;
+      border-radius: 8px;
+      font-weight: 700;
     }
 
     .snap-moment-item {
       display: flex;
       align-items: center;
       gap: 0.6rem;
-      padding: 0.35rem 0;
-      font-size: 0.85rem;
-      border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+      padding: 0.5rem 0.65rem;
+      font-size: 0.88rem;
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+      margin-bottom: 0.35rem;
+      border-left: 3px solid var(--border);
+      transition: background 0.15s;
     }
-    .snap-moment-item:last-child { border-bottom: none; }
+    .snap-moment-item:hover { background: rgba(255,255,255,0.04); }
+    .snap-moment-item.top1 { border-left-color: var(--gold); }
+    .snap-moment-item.top2 { border-left-color: #94a3b8; }
+    .snap-moment-item.top3 { border-left-color: #d97706; }
+
+    .snap-moment-rank {
+      font-weight: 900;
+      font-size: 0.85rem;
+      width: 1.8rem;
+      text-align: center;
+      flex-shrink: 0;
+    }
 
     .snap-moment-db {
       font-weight: 700;
@@ -318,31 +399,48 @@
       font-variant-numeric: tabular-nums;
     }
 
-    .snap-moment-label { flex: 1; }
-    .snap-moment-time { color: #818cf8; font-size: 0.78rem; }
-
-    .snap-detail-achs {
-      margin-top: 0.8rem;
+    .snap-moment-label {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .snap-moment-time {
+      color: var(--muted);
+      font-size: 0.75rem;
+      flex-shrink: 0;
     }
 
-    .snap-detail-achs-title {
-      font-size: 0.75rem;
-      color: #a5b4fc;
-      text-transform: uppercase;
-      margin-bottom: 0.4rem;
+    /* Achievements Grid */
+    .snap-ach-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 0.4rem;
     }
 
     .snap-ach-item {
-      display: inline-flex;
+      display: flex;
       align-items: center;
-      gap: 0.3rem;
-      padding: 0.25rem 0.6rem;
-      background: rgba(99, 102, 241, 0.15);
-      border-radius: 6px;
+      gap: 0.4rem;
+      padding: 0.45rem 0.6rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
       font-size: 0.8rem;
-      margin: 0.15rem;
+      transition: background 0.15s;
     }
-    .snap-ach-item.locked { opacity: 0.35; }
+    .snap-ach-item.unlocked {
+      border-color: rgba(34, 197, 94, 0.3);
+      background: rgba(34, 197, 94, 0.06);
+    }
+    .snap-ach-item.locked { opacity: 0.3; }
+
+    .snap-ach-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+    .snap-ach-info { min-width: 0; }
+    .snap-ach-name { font-weight: 600; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .snap-ach-dur { font-size: 0.65rem; color: var(--gold); }
 
     /* ── Cards ── */
     .card {
@@ -692,53 +790,75 @@
     function showSnapshotDetail(idx) {
       const s = snapshots[idx];
       const level = getLevel(s.record.db);
+      const achUnlocked = s.achievements ? s.achievements.filter(a => a.achieved).length : 0;
+
+      // Moments HTML
       let momentsHtml = '';
       if (s.moments && s.moments.length > 0) {
         const sorted = [...s.moments].sort((a,b) => b.db - a.db);
         momentsHtml = `
-          <div class="snap-detail-moments">
-            <div class="snap-detail-moments-title">Logged Moments (${sorted.length})</div>
-            ${sorted.map(m => `
-              <div class="snap-moment-item">
+          <div class="snap-detail-section">
+            <div class="snap-section-title">Logged Moments <span class="snap-section-badge">${sorted.length}</span></div>
+            ${sorted.map((m, i) => {
+              const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i+1}`;
+              const topClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+              return `<div class="snap-moment-item ${topClass}">
+                <span class="snap-moment-rank">${medal}</span>
                 <span class="snap-moment-db" style="color:${getLevel(m.db).color}">${m.db} dB</span>
                 <span class="snap-moment-label">${m.label || '(unnamed)'}</span>
                 <span class="snap-moment-time">${m.time}</span>
-              </div>
-            `).join('')}
+              </div>`;
+            }).join('')}
           </div>
         `;
       }
 
+      // Achievements HTML
       let achHtml = '';
       if (s.achievements) {
         achHtml = `
-          <div class="snap-detail-achs">
-            <div class="snap-detail-achs-title">Achievements</div>
-            ${s.achievements.map(a => `
-              <span class="snap-ach-item ${a.achieved ? '' : 'locked'}">
-                ${achievements.find(x=>x.db===a.db)?.icon||''} ${a.name} ${a.achieved ? '✅' : '⬜'}
-                ${a.achieved && a.totalDuration ? `<span style="color:var(--gold);font-size:0.72rem;margin-left:0.3rem">${fmtDur(a.totalDuration)}</span>` : ''}
-              </span>
-            `).join('')}
+          <div class="snap-detail-section">
+            <div class="snap-section-title">Achievements <span class="snap-section-badge">${achUnlocked}/${s.achievements.length}</span></div>
+            <div class="snap-ach-grid">
+              ${[...s.achievements].reverse().map(a => {
+                const def = achievements.find(x => x.db === a.db);
+                return `<div class="snap-ach-item ${a.achieved ? 'unlocked' : 'locked'}">
+                  <span class="snap-ach-icon">${def?.icon || ''}</span>
+                  <div class="snap-ach-info">
+                    <div class="snap-ach-name">${a.name}</div>
+                    ${a.achieved && a.totalDuration ? `<div class="snap-ach-dur">${fmtDur(a.totalDuration)} total</div>` : ''}
+                  </div>
+                </div>`;
+              }).join('')}
+            </div>
           </div>
         `;
       }
 
       snapDetail.innerHTML = `
         <div class="snap-detail-banner">
-          <div class="snap-detail-top">
-            <div class="snap-detail-title">📸 ${s.name}</div>
-            <button class="snap-detail-close" id="closeSnapDetail">✕ Close</button>
+          <div class="snap-detail-header">
+            <div class="snap-detail-top">
+              <div class="snap-detail-title-wrap">
+                <div class="snap-detail-label">Saved Session</div>
+                <div class="snap-detail-title">${s.name}</div>
+                ${s.date ? `<div class="snap-detail-date">📅 ${s.date}</div>` : ''}
+              </div>
+              <button class="snap-detail-close" id="closeSnapDetail">✕ Close</button>
+            </div>
           </div>
           <div class="snap-detail-stats">
             <div class="snap-detail-stat">
               <div class="val" style="color:${level.color}">${s.record.db}</div>
-              <div class="lbl">Peak dB</div>
+              <div class="lbl">🏆 Peak dB</div>
             </div>
-            ${s.sessionStats?.avg != null ? `<div class="snap-detail-stat"><div class="val">${s.sessionStats.avg}</div><div class="lbl">Avg dB</div></div>` : ''}
-            ${s.sessionStats?.min != null ? `<div class="snap-detail-stat"><div class="val">${s.sessionStats.min}</div><div class="lbl">Min dB</div></div>` : ''}
-            ${s.moments ? `<div class="snap-detail-stat"><div class="val">${s.moments.length}</div><div class="lbl">Moments</div></div>` : ''}
-            ${s.date ? `<div class="snap-detail-stat"><div class="val" style="font-size:1rem">${s.date}</div><div class="lbl">Date</div></div>` : ''}
+            ${s.sessionStats?.avg != null ? `<div class="snap-detail-stat"><div class="val">${s.sessionStats.avg}</div><div class="lbl">📊 Avg dB</div></div>` : ''}
+            ${s.sessionStats?.min != null ? `<div class="snap-detail-stat"><div class="val">${s.sessionStats.min}</div><div class="lbl">📉 Min dB</div></div>` : ''}
+            ${s.moments ? `<div class="snap-detail-stat"><div class="val">${s.moments.length}</div><div class="lbl">📌 Moments</div></div>` : ''}
+            <div class="snap-detail-stat">
+              <div class="val">${achUnlocked}<span style="font-size:0.8rem;color:var(--muted)">/${s.achievements?.length || 10}</span></div>
+              <div class="lbl">✅ Unlocked</div>
+            </div>
           </div>
           ${momentsHtml}
           ${achHtml}
