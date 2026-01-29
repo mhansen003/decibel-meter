@@ -410,6 +410,111 @@
       .meter-row > .card-gauge { flex: none; }
     }
 
+    /* ── Winner Badge ── */
+    .snap-item.winner {
+      border-color: var(--gold);
+      background: linear-gradient(135deg, rgba(251,191,36,0.08), rgba(251,191,36,0.02));
+    }
+    .snap-winner-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      color: #0a0e17;
+      font-size: 0.6rem;
+      font-weight: 800;
+      padding: 0.15rem 0.5rem;
+      border-radius: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* ── Transcript Panel (Right Side) ── */
+    .transcript-panel {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: #0d1117;
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+    .transcript-header {
+      padding: 1.2rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .transcript-header h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .transcript-header p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+    .transcript-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .transcript-empty {
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.6;
+    }
+    .tx-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+      padding: 0.35rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      animation: txFadeIn 0.3s ease;
+    }
+    @keyframes txFadeIn {
+      from { opacity: 0; transform: translateX(8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    .tx-entry:hover { background: rgba(255,255,255,0.03); }
+    .tx-time {
+      color: var(--muted);
+      font-size: 0.65rem;
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+      min-width: 3.2rem;
+      padding-top: 0.1rem;
+    }
+    .tx-icon { flex-shrink: 0; font-size: 0.8rem; }
+    .tx-msg { flex: 1; min-width: 0; word-break: break-word; }
+    .tx-entry.tx-start { color: var(--green); }
+    .tx-entry.tx-stop { color: var(--muted); }
+    .tx-entry.tx-peak { color: var(--pink); }
+    .tx-entry.tx-ach { color: var(--gold); }
+    .tx-entry.tx-level { color: var(--cyan); }
+    .tx-entry.tx-save { color: var(--teal); }
+    .tx-count {
+      font-size: 0.7rem;
+      font-weight: 700;
+      background: var(--border);
+      color: var(--muted);
+      padding: 0.1rem 0.4rem;
+      border-radius: 8px;
+      min-width: 1.4rem;
+      text-align: center;
+    }
+
+
     /* ── Gauge ── */
     .gauge-wrap { display: flex; flex-direction: column; align-items: center; position: relative; }
 
@@ -635,6 +740,7 @@
     @media (max-width: 900px) {
       body { flex-direction: column; }
       .sidebar { width: 100%; min-height: auto; max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
+      .transcript-panel { width: 100%; min-height: auto; max-height: 200px; border-left: none; border-top: 1px solid var(--border); order: 99; }
       .snap-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; }
       .snap-item { min-width: 200px; flex-shrink: 0; }
       .lightning-left, .lightning-right { display: none; }
@@ -758,6 +864,17 @@
 
   </div>
 
+  <!-- Transcript Panel (Right Side) -->
+  <aside class="transcript-panel">
+    <div class="transcript-header">
+      <h2>📋 Live Transcript <span class="tx-count" id="txCount">0</span></h2>
+      <p>Real-time session events</p>
+    </div>
+    <div class="transcript-list" id="txList">
+      <div class="transcript-empty">Start listening to see<br>real-time events here.</div>
+    </div>
+  </aside>
+
   <!-- Confirm Clear Modal -->
   <div class="modal-overlay" id="clearModal">
     <div class="modal-box">
@@ -817,6 +934,7 @@
     const achList=document.getElementById('achList');
     const snapListEl=document.getElementById('snapList'), snapCountEl=document.getElementById('snapCount');
     const snapDetail=document.getElementById('snapDetail');
+    const txList=document.getElementById('txList'), txCount=document.getElementById('txCount');
     const gaugeCanvas=document.getElementById('gaugeCanvas'), gaugeCtx=gaugeCanvas.getContext('2d');
     const waveCanvas=document.getElementById('waveCanvas'), waveCtx=waveCanvas.getContext('2d');
 
@@ -860,6 +978,34 @@
     function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
     function timeStr(){return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
     function dateStr(){return new Date().toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'});}
+
+    let txEntryCount = 0;
+    let lastLevelLog = 0;
+    let lastLevelDb = -1;
+    let lastAchievements = new Set();
+
+    function txLog(icon, msg, cls) {
+      if (txEntryCount === 0) txList.innerHTML = '';
+      txEntryCount++;
+      txCount.textContent = txEntryCount;
+      const entry = document.createElement('div');
+      entry.className = 'tx-entry ' + (cls || '');
+      const now = new Date();
+      const t = now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      entry.innerHTML = '<span class="tx-time">' + t + '</span><span class="tx-icon">' + icon + '</span><span class="tx-msg">' + msg + '</span>';
+      txList.appendChild(entry);
+      txList.scrollTop = txList.scrollHeight;
+    }
+
+    function txClear() {
+      txList.innerHTML = '<div class="transcript-empty">Start listening to see<br>real-time events here.</div>';
+      txEntryCount = 0;
+      txCount.textContent = '0';
+      lastLevelLog = 0;
+      lastLevelDb = -1;
+      lastAchievements.clear();
+    }
+
     function fmtDur(sec){
       if(sec<1) return '<1s';
       if(sec<60) return Math.round(sec)+'s';
@@ -874,13 +1020,18 @@
         return;
       }
       snapListEl.innerHTML = '';
+      // Determine winner (highest peak dB)
+      let winnerIdx = -1, winnerDb = -1;
+      snapshots.forEach((s, i) => { if (s.record && s.record.db > winnerDb) { winnerDb = s.record.db; winnerIdx = i; } });
+
       snapshots.forEach((s, i) => {
         const item = document.createElement('div');
-        item.className = 'snap-item';
+        const isWinner = i === winnerIdx && snapshots.length > 1;
+        item.className = 'snap-item' + (isWinner ? ' winner' : '');
         item.dataset.idx = i;
         const level = getLevel(s.record.db);
         item.innerHTML = `
-          <div class="snap-name">${s.name}</div>
+          <div class="snap-name">${s.name}${isWinner ? ' <span class="snap-winner-badge">👑 Winner</span>' : ''}</div>
           <div class="snap-meta">
             <span class="snap-peak" style="color:${level.color}">⚡ ${s.record.db} dB</span>
             <span>${s.date || ''}</span>
@@ -1012,7 +1163,7 @@
 
     function checkRecord(db){
       if(db<=0)return;
-      if(db>allTimeRecord){allTimeRecord=db;allTimeRecordTime=timeStr();localStorage.setItem('db_record',String(allTimeRecord));localStorage.setItem('db_record_time',allTimeRecordTime);peakRecord.classList.remove('flash');void peakRecord.offsetWidth;peakRecord.classList.add('flash');peakCard.classList.remove('flash-card');void peakCard.offsetWidth;peakCard.classList.add('flash-card');renderAchievements();}
+      if(db>allTimeRecord){txLog('⚡','New peak: '+db+' dB — '+getLevel(db).label,'tx-peak');allTimeRecord=db;allTimeRecordTime=timeStr();localStorage.setItem('db_record',String(allTimeRecord));localStorage.setItem('db_record_time',allTimeRecordTime);peakRecord.classList.remove('flash');void peakRecord.offsetWidth;peakRecord.classList.add('flash');peakCard.classList.remove('flash-card');void peakCard.offsetWidth;peakCard.classList.add('flash-card');renderAchievements();}
       peakRecordDb.textContent=allTimeRecord;peakRecordTime.textContent=allTimeRecordTime?`Set at ${allTimeRecordTime}`:'Make some thunder!';barRecordMarker.style.left=((allTimeRecord/MAX_DB)*100)+'%';
     }
 
@@ -1049,6 +1200,8 @@
       if(db>peakDb){peakDb=db;peakDecay=0;}else{peakDecay++;if(peakDecay>40)peakDb=Math.max(peakDb-.5,db);}
       if(db>0){sessionMin=Math.min(sessionMin,db);sessionMax=Math.max(sessionMax,db);sessionSum+=db;sessionCount++;}
       checkRecord(db);updateAchDurations(db);
+      if(Date.now()-lastLevelLog>=5000&&db>0){lastLevelLog=Date.now();txLog('📊',db+' dB — '+getLevel(db).label,'tx-level');}
+      achievements.forEach(a=>{if(db>=a.db&&!lastAchievements.has(a.db)){lastAchievements.add(a.db);txLog('🏆','Unlocked: '+a.icon+' '+a.name,'tx-ach');}});
       if(sessionCount%60===0)renderAchievements();
       const lv=getLevel(db);dbValue.textContent=db;dbValue.style.color=lv.color;dbLabel.textContent=lv.label;dbLabel.style.color=lv.color;
       barFill.style.width=(db/MAX_DB*100)+'%';barPeak.style.left=(peakDb/MAX_DB*100)+'%';
@@ -1064,6 +1217,7 @@
         analyser=audioCtx.createAnalyser();analyser.fftSize=4096;analyser.smoothingTimeConstant=.2;analyser.minDecibels=-127;analyser.maxDecibels=0;
         source=audioCtx.createMediaStreamSource(stream);source.connect(analyser);
         listening=true;sessionStartTime=Date.now();
+        txClear();txLog('🎙️','Session started — listening for thunder!','tx-start');
         startBtn.classList.add('listening');btnText.textContent='Stop Listening';
         snapshotBtn.style.display='block';
         [meterRow,peakCard,achCard].forEach(c=>c.classList.remove('hidden'));
@@ -1073,7 +1227,8 @@
     }
 
     function stopListening(){
-      listening=false;cancelAnimationFrame(animId);
+      listening=false;
+      if(sessionCount>0){const dur=Math.round((Date.now()-sessionStartTime)/1000);const m=Math.floor(dur/60);const sec=dur%60;txLog('🛑','Session ended — '+m+'m '+sec+'s','tx-stop');}cancelAnimationFrame(animId);
       if(source)source.disconnect();if(stream)stream.getTracks().forEach(t=>t.stop());if(audioCtx)audioCtx.close();
       startBtn.classList.remove('listening');btnText.textContent='Start Listening';
       snapshotBtn.style.display='none';
@@ -1110,6 +1265,7 @@
 
     function doSaveAndReset(){
       const sessionName=modalInput.value.trim()||'Unnamed Session';
+      txLog('💾','Session saved: '+sessionName,'tx-save');
       const snapshot={
         name: sessionName,
         date: dateStr(),
