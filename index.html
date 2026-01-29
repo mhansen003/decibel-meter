@@ -422,8 +422,8 @@
       display: flex;
       gap: 1rem;
       flex-shrink: 0;
-      max-height: 180px;
-      min-height: 120px;
+      max-height: 240px;
+      min-height: 160px;
     }
     .bottom-row > .card {
       flex: 1;
@@ -489,216 +489,6 @@
       50% { opacity: 1; text-shadow: 0 0 20px var(--teal), 0 0 40px var(--cyan); }
     }
 
-
-    /* ── Dancing Guy ── */
-    .dancer-wrap {
-      display: flex;
-      justify-content: center;
-      align-items: flex-end;
-      height: 160px;
-      flex-shrink: 0;
-      z-index: 1;
-      position: relative;
-      margin-top: 0.5rem;
-    }
-    .dancer {
-      position: relative;
-      width: 80px;
-      height: 150px;
-      transition: transform 0.1s;
-    }
-    .dancer-head {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: var(--text);
-    }
-    .dancer-body-line {
-      position: absolute;
-      top: 28px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 5px;
-      height: 40px;
-      background: var(--text);
-      border-radius: 3px;
-      transform-origin: top center;
-    }
-    .dancer-arm {
-      position: absolute;
-      top: 32px;
-      width: 5px;
-      height: 36px;
-      background: var(--text);
-      border-radius: 3px;
-      transform-origin: top center;
-    }
-    .dancer-arm-l { left: 2px; }
-    .dancer-arm-r { right: 2px; }
-    .dancer-leg {
-      position: absolute;
-      width: 5px;
-      height: 46px;
-      background: var(--text);
-      border-radius: 3px;
-      transform-origin: top center;
-      top: 68px;
-    }
-    .dancer-leg-l { left: 18px; }
-    .dancer-leg-r { right: 18px; }
-
-    /* Idle — gentle breathing */
-    .dancer-idle .dancer {
-      animation: d-idle 3s ease-in-out infinite;
-    }
-    @keyframes d-idle {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-1px); }
-    }
-
-    /* Calm — slight sway */
-    .dancer-calm .dancer {
-      animation: d-sway 1.5s ease-in-out infinite;
-    }
-    .dancer-calm .dancer-arm-l { animation: d-arm-gentle 1.5s ease-in-out infinite; }
-    .dancer-calm .dancer-arm-r { animation: d-arm-gentle 1.5s ease-in-out infinite reverse; }
-    @keyframes d-sway {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-2px) rotate(2deg); }
-    }
-    @keyframes d-arm-gentle {
-      0%, 100% { transform: rotate(10deg); }
-      50% { transform: rotate(-10deg); }
-    }
-
-    /* Grooving — bobbing */
-    .dancer-groove .dancer {
-      animation: d-bob 0.6s ease-in-out infinite;
-    }
-    .dancer-groove .dancer-arm-l { animation: d-arm-wave 0.6s ease-in-out infinite; }
-    .dancer-groove .dancer-arm-r { animation: d-arm-wave 0.6s ease-in-out infinite reverse; }
-    .dancer-groove .dancer-leg-l { animation: d-leg-step 0.6s ease-in-out infinite; }
-    .dancer-groove .dancer-leg-r { animation: d-leg-step 0.6s ease-in-out infinite reverse; }
-    @keyframes d-bob {
-      0%, 100% { transform: translateY(0) rotate(-2deg); }
-      50% { transform: translateY(-5px) rotate(2deg); }
-    }
-    @keyframes d-arm-wave {
-      0%, 100% { transform: rotate(20deg); }
-      50% { transform: rotate(-30deg); }
-    }
-    @keyframes d-leg-step {
-      0%, 100% { transform: rotate(10deg); }
-      50% { transform: rotate(-10deg); }
-    }
-
-    /* Hyped — jumping */
-    .dancer-hyped .dancer {
-      animation: d-jump 0.4s ease-in-out infinite;
-    }
-    .dancer-hyped .dancer-arm-l { animation: d-arm-pump 0.4s ease-in-out infinite; }
-    .dancer-hyped .dancer-arm-r { animation: d-arm-pump 0.4s ease-in-out infinite reverse; }
-    .dancer-hyped .dancer-leg-l { animation: d-leg-kick 0.4s ease-in-out infinite; }
-    .dancer-hyped .dancer-leg-r { animation: d-leg-kick 0.4s ease-in-out infinite reverse; }
-    .dancer-hyped .dancer-head { animation: d-head-bop 0.4s ease-in-out infinite; }
-    @keyframes d-jump {
-      0%, 100% { transform: translateY(0) rotate(-3deg); }
-      50% { transform: translateY(-10px) rotate(3deg); }
-    }
-    @keyframes d-arm-pump {
-      0%, 100% { transform: rotate(40deg); }
-      50% { transform: rotate(-60deg); }
-    }
-    @keyframes d-leg-kick {
-      0%, 100% { transform: rotate(15deg); }
-      50% { transform: rotate(-20deg); }
-    }
-    @keyframes d-head-bop {
-      0%, 100% { transform: translateX(-50%) scale(1); }
-      50% { transform: translateX(-50%) scale(1.1); }
-    }
-
-    /* Wild — bouncing hard */
-    .dancer-wild .dancer {
-      animation: d-wild 0.28s ease-in-out infinite;
-    }
-    .dancer-wild .dancer-arm-l { animation: d-arm-flail 0.28s ease-in-out infinite; }
-    .dancer-wild .dancer-arm-r { animation: d-arm-flail 0.28s ease-in-out infinite reverse; }
-    .dancer-wild .dancer-leg-l { animation: d-leg-flail 0.28s ease-in-out infinite; }
-    .dancer-wild .dancer-leg-r { animation: d-leg-flail 0.28s ease-in-out infinite reverse; }
-    .dancer-wild .dancer-head { animation: d-head-wild 0.28s ease-in-out infinite; }
-    .dancer-wild .dancer-body-line { animation: d-body-twist 0.28s ease-in-out infinite; }
-    @keyframes d-wild {
-      0%, 100% { transform: translateY(0) rotate(-5deg) scaleY(1); }
-      25% { transform: translateY(-14px) rotate(4deg) scaleY(0.9); }
-      50% { transform: translateY(-4px) rotate(-4deg) scaleY(1.05); }
-      75% { transform: translateY(-16px) rotate(5deg) scaleY(0.9); }
-    }
-    @keyframes d-arm-flail {
-      0% { transform: rotate(60deg); }
-      25% { transform: rotate(-80deg); }
-      50% { transform: rotate(70deg); }
-      75% { transform: rotate(-90deg); }
-      100% { transform: rotate(60deg); }
-    }
-    @keyframes d-leg-flail {
-      0%, 100% { transform: rotate(25deg); }
-      50% { transform: rotate(-30deg); }
-    }
-    @keyframes d-head-wild {
-      0%, 100% { transform: translateX(-50%) scale(1); }
-      33% { transform: translateX(-40%) scale(1.15); }
-      66% { transform: translateX(-60%) scale(1.1); }
-    }
-    @keyframes d-body-twist {
-      0%, 100% { transform: translateX(-50%) rotate(0deg); }
-      50% { transform: translateX(-50%) rotate(6deg); }
-    }
-
-    /* Insane — absolute madness */
-    .dancer-insane .dancer {
-      animation: d-insane 0.18s ease-in-out infinite;
-    }
-    .dancer-insane .dancer-arm-l { animation: d-arm-insane 0.15s linear infinite; }
-    .dancer-insane .dancer-arm-r { animation: d-arm-insane 0.15s linear infinite reverse; }
-    .dancer-insane .dancer-leg-l { animation: d-leg-insane 0.18s ease-in-out infinite; }
-    .dancer-insane .dancer-leg-r { animation: d-leg-insane 0.18s ease-in-out infinite reverse; }
-    .dancer-insane .dancer-head { animation: d-head-insane 0.18s linear infinite; }
-    .dancer-insane .dancer-body-line { animation: d-body-insane 0.18s ease-in-out infinite; }
-    @keyframes d-insane {
-      0% { transform: translateY(0) rotate(0deg) scaleX(1); }
-      20% { transform: translateY(-20px) rotate(8deg) scaleX(0.9); }
-      40% { transform: translateY(-4px) rotate(-10deg) scaleX(1.1); }
-      60% { transform: translateY(-22px) rotate(6deg) scaleX(0.85); }
-      80% { transform: translateY(-8px) rotate(-8deg) scaleX(1.1); }
-      100% { transform: translateY(0) rotate(0deg) scaleX(1); }
-    }
-    @keyframes d-arm-insane {
-      0% { transform: rotate(0deg); }
-      25% { transform: rotate(-120deg); }
-      50% { transform: rotate(100deg); }
-      75% { transform: rotate(-110deg); }
-      100% { transform: rotate(0deg); }
-    }
-    @keyframes d-leg-insane {
-      0%, 100% { transform: rotate(35deg); }
-      50% { transform: rotate(-40deg); }
-    }
-    @keyframes d-head-insane {
-      0%, 100% { transform: translateX(-50%) scale(1) rotate(0deg); }
-      25% { transform: translateX(-40%) scale(1.2) rotate(10deg); }
-      50% { transform: translateX(-60%) scale(0.9) rotate(-10deg); }
-      75% { transform: translateX(-45%) scale(1.25) rotate(8deg); }
-    }
-    @keyframes d-body-insane {
-      0%, 100% { transform: translateX(-50%) rotate(0deg) scaleY(1); }
-      33% { transform: translateX(-50%) rotate(8deg) scaleY(0.85); }
-      66% { transform: translateX(-50%) rotate(-8deg) scaleY(1.1); }
-    }
 
     /* ── Peak Record ── */
     .peak-record { display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
@@ -1092,16 +882,6 @@
             <span class="db-value" id="dbValue">--</span><span class="db-unit">dB</span>
             <div class="db-label" id="dbLabel">Waiting...</div>
           </div>
-          <div class="dancer-wrap dancer-idle" id="dancerWrap">
-            <div class="dancer" id="dancer">
-              <div class="dancer-head"></div>
-              <div class="dancer-body-line"></div>
-              <div class="dancer-arm dancer-arm-l"></div>
-              <div class="dancer-arm dancer-arm-r"></div>
-              <div class="dancer-leg dancer-leg-l"></div>
-              <div class="dancer-leg dancer-leg-r"></div>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -1213,7 +993,6 @@
     const barCard=document.getElementById('barCard');
     const waveCard=document.getElementById('waveCard'), meterRow=document.getElementById('meterRow');
     const bottomRow=document.getElementById('bottomRow');
-    const dancerWrap=document.getElementById('dancerWrap');
     const dbValue=document.getElementById('dbValue'), dbLabel=document.getElementById('dbLabel');
     const barFill=document.getElementById('barFill'), barPeak=document.getElementById('barPeak');
     const barRecordMarker=document.getElementById('barRecordMarker');
@@ -1423,22 +1202,6 @@
     }
 
 
-    let lastDancerClass = 'dancer-idle';
-    function updateDancer(db) {
-      let cls;
-      if (db <= 0) cls = 'dancer-idle';
-      else if (db < 30) cls = 'dancer-calm';
-      else if (db < 60) cls = 'dancer-groove';
-      else if (db < 85) cls = 'dancer-hyped';
-      else if (db < 110) cls = 'dancer-wild';
-      else cls = 'dancer-insane';
-      if (cls !== lastDancerClass) {
-        dancerWrap.classList.remove(lastDancerClass);
-        dancerWrap.classList.add(cls);
-        lastDancerClass = cls;
-      }
-    }
-
     function checkRecord(db){
       if(db<=0)return;
       if(db>allTimeRecord){allTimeRecord=db;allTimeRecordTime=timeStr();localStorage.setItem('db_record',String(allTimeRecord));localStorage.setItem('db_record_time',allTimeRecordTime);peakRecord.classList.remove('flash');void peakRecord.offsetWidth;peakRecord.classList.add('flash');peakCard.classList.remove('flash-card');void peakCard.offsetWidth;peakCard.classList.add('flash-card');renderAchievements();}
@@ -1481,7 +1244,7 @@
       if(sessionCount%60===0)renderAchievements();
       const lv=getLevel(db);dbValue.textContent=db;dbValue.style.color=lv.color;dbLabel.textContent=lv.label;dbLabel.style.color=lv.color;
       barFill.style.width=(db/MAX_DB*100)+'%';barPeak.style.left=(peakDb/MAX_DB*100)+'%';
-      drawGauge(db);updateDancer(db);
+      drawGauge(db);
       thermoFill.style.height=(db/MAX_DB*100)+'%';thermoGlow.style.bottom=(db/MAX_DB*100)+'%';
       const wd=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(wd);drawWaveform(wd);
       animId=requestAnimationFrame(loop);
@@ -1503,7 +1266,7 @@
     }
 
     function stopListening(){
-      listening=false;updateDancer(0);cancelAnimationFrame(animId);
+      listening=false;cancelAnimationFrame(animId);
       if(source)source.disconnect();if(stream)stream.getTracks().forEach(t=>t.stop());if(audioCtx)audioCtx.close();
       startBtn.classList.remove('listening');btnText.textContent='Start Listening';
       saveBtn.style.display='none';resetBtn.style.display='none';
