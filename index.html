@@ -67,6 +67,31 @@
       margin-top: 0.2rem;
     }
 
+    .sidebar-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .clear-all-btn {
+      background: none;
+      border: 1px solid rgba(239,68,68,0.3);
+      color: var(--muted);
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .clear-all-btn:hover {
+      color: var(--red);
+      border-color: var(--red);
+      background: rgba(239,68,68,0.1);
+    }
+
     .snap-count {
       background: linear-gradient(135deg, var(--teal), var(--pink));
       color: #fff;
@@ -589,7 +614,10 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <h2>⚡ Sessions <span class="snap-count" id="snapCount">0</span></h2>
+      <div class="sidebar-header-row">
+        <h2>⚡ Sessions <span class="snap-count" id="snapCount">0</span></h2>
+        <button class="clear-all-btn" id="clearAllBtn">Clear All</button>
+      </div>
       <p>Captured lightning moments</p>
     </div>
     <div class="snap-list" id="snapList">
@@ -1040,6 +1068,18 @@
     modalSave.addEventListener('click', doSaveAndReset);
     modalInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doSaveAndReset(); });
     saveModal.addEventListener('click', e=>{ if(e.target===saveModal) closeSaveModal(); });
+
+    // ── Clear All Sessions ──
+    document.getElementById('clearAllBtn').addEventListener('click',()=>{
+      if(!snapshots.length) return;
+      if(confirm('Clear all '+snapshots.length+' saved sessions? This cannot be undone.')){
+        snapshots=[];
+        localStorage.removeItem('db_snapshots');
+        renderSnapshots();
+        snapDetail.classList.remove('visible');
+        snapDetail.innerHTML='';
+      }
+    });
 
     renderSnapshots();
   </script>
