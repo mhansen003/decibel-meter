@@ -532,6 +532,16 @@
       border: 2px solid var(--border);
       overflow: hidden;
     }
+    .thermo-watermark {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(255,20,147,0.06), rgba(255,20,147,0.12));
+      border-radius: 0 0 16px 16px;
+      transition: height 0.3s ease;
+      z-index: 0;
+    }
     .thermo-fill {
       position: absolute;
       bottom: 0;
@@ -539,6 +549,7 @@
       right: 0;
       background: linear-gradient(to top, #7cb342 0%, #00bcd4 35%, #26c6da 50%, #ff1493 75%, #e91e8c 88%, #d500f9 100%);
       border-radius: 0 0 16px 16px;
+      z-index: 1;
       transition: height 0.15s ease;
     }
     .thermo-record-line {
@@ -891,6 +902,7 @@
         <div class="thermo-wrap">
           <div class="thermo-tube-wrap">
             <div class="thermo-tube">
+              <div class="thermo-watermark" id="thermoWatermark"></div>
               <div class="thermo-fill" id="thermoFill"></div>
               <div class="thermo-record-line" id="thermoRecord" style="bottom:0%"></div>
               <div class="thermo-current-glow" id="thermoGlow" style="bottom:0%"></div>
@@ -999,6 +1011,7 @@
     const peakRecordDb=document.getElementById('peakRecordDb'), peakRecordTime=document.getElementById('peakRecordTime');
     const peakRecord=document.getElementById('peakRecord');
     const thermoFill=document.getElementById('thermoFill'), thermoRecord=document.getElementById('thermoRecord');
+    const thermoWatermark=document.getElementById('thermoWatermark');
     const thermoGlow=document.getElementById('thermoGlow'), thermoScale=document.getElementById('thermoScale');
     const snapListEl=document.getElementById('snapList'), snapCountEl=document.getElementById('snapCount');
     const snapDetail=document.getElementById('snapDetail');
@@ -1195,9 +1208,11 @@
       // Update record line
       if(allTimeRecord>0){
         thermoRecord.style.bottom=(allTimeRecord/MAX_DB*100)+'%';
+        thermoWatermark.style.height=(allTimeRecord/MAX_DB*100)+'%';
         thermoRecord.style.opacity='1';
       } else {
         thermoRecord.style.opacity='0';
+        thermoWatermark.style.height='0%';
       }
     }
 
