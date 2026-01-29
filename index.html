@@ -284,12 +284,18 @@
     }
     .action-btn:hover { transform: translateY(-1px); }
 
-    #snapshotBtn {
+    #saveBtn {
       background: linear-gradient(135deg, var(--pink), var(--magenta));
       color: #fff;
       box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
     }
-    #snapshotBtn:hover { box-shadow: 0 6px 20px rgba(255, 20, 147, 0.5); }
+    #saveBtn:hover { box-shadow: 0 6px 20px rgba(255, 20, 147, 0.5); }
+    #resetBtn {
+      background: linear-gradient(135deg, #475569, #64748b);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(71, 85, 105, 0.3);
+    }
+    #resetBtn:hover { box-shadow: 0 6px 20px rgba(100, 116, 139, 0.5); }
 
     /* ── Snapshot Detail Modal ── */
     .snap-detail-overlay { display: none; overflow-y: auto; max-height: 100vh; }
@@ -1027,7 +1033,7 @@
       <p>Captured lightning moments</p>
     </div>
     <div class="snap-list" id="snapList">
-      <div class="snap-empty">No snapshots yet.<br>Run a session, then hit<br>"📸 Save & Reset"<br>to capture the lightning.</div>
+      <div class="snap-empty">No snapshots yet.<br>Run a session, then hit<br>"💾 Save" to capture the lightning.</div>
     </div>
   </aside>
 
@@ -1050,7 +1056,8 @@
           <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
           <span id="btnText">Start Listening</span>
         </button>
-        <button id="snapshotBtn" class="action-btn">📸 Save &amp; Reset</button>
+        <button id="saveBtn" class="action-btn">💾 Save</button>
+        <button id="resetBtn" class="action-btn">🔄 Reset</button>
       </div>
 
       <!-- Snapshot Detail Viewer -->
@@ -1181,7 +1188,7 @@
         </div>
         <div class="modal-actions">
           <button class="modal-btn modal-btn-cancel" id="modalCancel">Cancel</button>
-          <button class="modal-btn modal-btn-save" id="modalSave">⚡ Save & Reset</button>
+          <button class="modal-btn modal-btn-save" id="modalSave">⚡ Save</button>
         </div>
       </div>
     </div>
@@ -1191,7 +1198,7 @@
     const MAX_DB = 180;
 
     const startBtn=document.getElementById('startBtn');
-    const snapshotBtn=document.getElementById('snapshotBtn'), btnText=document.getElementById('btnText');
+    const saveBtn=document.getElementById('saveBtn'), resetBtn=document.getElementById('resetBtn'), btnText=document.getElementById('btnText');
     const gaugeCard=document.getElementById('gaugeCard'), peakCard=document.getElementById('peakCard');
     const barCard=document.getElementById('barCard');
     const waveCard=document.getElementById('waveCard'), meterRow=document.getElementById('meterRow');
@@ -1259,7 +1266,7 @@
     function renderSnapshots() {
       snapCountEl.textContent = snapshots.length;
       if (snapshots.length === 0) {
-        snapListEl.innerHTML = '<div class="snap-empty">No snapshots yet.<br>Run a session, then hit<br>"📸 Save & Reset"<br>to capture the lightning.</div>';
+        snapListEl.innerHTML = '<div class="snap-empty">No snapshots yet.<br>Run a session, then hit<br>"💾 Save" to capture the lightning.</div>';
         return;
       }
       snapListEl.innerHTML = '';
@@ -1477,7 +1484,7 @@
         source=audioCtx.createMediaStreamSource(stream);source.connect(analyser);
         listening=true;sessionStartTime=Date.now();
         startBtn.classList.add('listening');btnText.textContent='Stop Listening';
-        snapshotBtn.style.display='block';
+        saveBtn.style.display='block';resetBtn.style.display='block';
         [meterRow,peakCard].forEach(c=>c.classList.remove('hidden'));
         sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
         renderAchievements();checkRecord(0);loop();
@@ -1488,7 +1495,7 @@
       listening=false;updateDancer(0);cancelAnimationFrame(animId);
       if(source)source.disconnect();if(stream)stream.getTracks().forEach(t=>t.stop());if(audioCtx)audioCtx.close();
       startBtn.classList.remove('listening');btnText.textContent='Start Listening';
-      snapshotBtn.style.display='none';
+      saveBtn.style.display='none';resetBtn.style.display='none';
       localStorage.setItem('db_ach_durations',JSON.stringify(achDurations));
       localStorage.setItem('db_ach_max_streaks',JSON.stringify(achMaxStreaks));
       renderAchievements();
@@ -1520,6 +1527,15 @@
 
     function closeSaveModal(){ saveModal.classList.remove('visible'); }
 
+    function doReset(){
+      allTimeRecord=0;allTimeRecordTime='';moments=[];achDurations={};achMaxStreaks={};achCurrentStreaks={};
+      localStorage.removeItem('db_record');localStorage.removeItem('db_record_time');localStorage.removeItem('db_moments');
+      localStorage.removeItem('db_ach_durations');localStorage.removeItem('db_ach_max_streaks');
+      sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;
+      peakRecordDb.textContent='--';peakRecordTime.textContent='Make some thunder!';barRecordMarker.style.left='0%';
+      renderAchievements();
+    }
+
     function doSaveAndReset(){
       const sessionName=modalInput.value.trim()||'Unnamed Session';
       const snapshot={
@@ -1534,16 +1550,12 @@
       snapshots.unshift(snapshot);
       localStorage.setItem('db_snapshots',JSON.stringify(snapshots));
       renderSnapshots();
-      allTimeRecord=0;allTimeRecordTime='';moments=[];achDurations={};achMaxStreaks={};achCurrentStreaks={};
-      localStorage.removeItem('db_record');localStorage.removeItem('db_record_time');localStorage.removeItem('db_moments');
-      localStorage.removeItem('db_ach_durations');localStorage.removeItem('db_ach_max_streaks');
-      sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;
-      peakRecordDb.textContent='--';peakRecordTime.textContent='Make some thunder!';barRecordMarker.style.left='0%';
-      renderAchievements();
+      doReset();
       closeSaveModal();
     }
 
-    snapshotBtn.addEventListener('click', openSaveModal);
+    saveBtn.addEventListener('click', openSaveModal);
+    resetBtn.addEventListener('click', doReset);
     modalCancel.addEventListener('click', closeSaveModal);
     modalSave.addEventListener('click', doSaveAndReset);
     modalInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doSaveAndReset(); });
