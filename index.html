@@ -495,7 +495,7 @@
       display: flex;
       justify-content: center;
       align-items: flex-end;
-      height: 80px;
+      height: 160px;
       flex-shrink: 0;
       z-index: 1;
       position: relative;
@@ -503,8 +503,8 @@
     }
     .dancer {
       position: relative;
-      width: 46px;
-      height: 76px;
+      width: 80px;
+      height: 150px;
       transition: transform 0.1s;
     }
     .dancer-head {
@@ -512,44 +512,44 @@
       top: 0;
       left: 50%;
       transform: translateX(-50%);
-      width: 18px;
-      height: 18px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       background: var(--text);
     }
     .dancer-body-line {
       position: absolute;
-      top: 18px;
+      top: 28px;
       left: 50%;
       transform: translateX(-50%);
-      width: 4px;
-      height: 22px;
+      width: 5px;
+      height: 40px;
       background: var(--text);
-      border-radius: 2px;
+      border-radius: 3px;
       transform-origin: top center;
     }
     .dancer-arm {
       position: absolute;
-      top: 20px;
-      width: 4px;
-      height: 20px;
+      top: 32px;
+      width: 5px;
+      height: 36px;
       background: var(--text);
-      border-radius: 2px;
+      border-radius: 3px;
       transform-origin: top center;
     }
-    .dancer-arm-l { left: 4px; }
-    .dancer-arm-r { right: 4px; }
+    .dancer-arm-l { left: 2px; }
+    .dancer-arm-r { right: 2px; }
     .dancer-leg {
       position: absolute;
-      width: 4px;
-      height: 24px;
+      width: 5px;
+      height: 46px;
       background: var(--text);
-      border-radius: 2px;
+      border-radius: 3px;
       transform-origin: top center;
-      top: 40px;
+      top: 68px;
     }
-    .dancer-leg-l { left: 12px; }
-    .dancer-leg-r { right: 12px; }
+    .dancer-leg-l { left: 18px; }
+    .dancer-leg-r { right: 18px; }
 
     /* Idle — gentle breathing */
     .dancer-idle .dancer {
