@@ -591,10 +591,9 @@
     const dbValue=document.getElementById('dbValue'), dbLabel=document.getElementById('dbLabel');
     const barFill=document.getElementById('barFill'), barPeak=document.getElementById('barPeak');
     const barRecordMarker=document.getElementById('barRecordMarker');
-    const statMin=document.getElementById('statMin'), statAvg=document.getElementById('statAvg'), statMax=document.getElementById('statMax');
     const peakRecordDb=document.getElementById('peakRecordDb'), peakRecordTime=document.getElementById('peakRecordTime');
     const peakRecord=document.getElementById('peakRecord');
-    const achList=document.getElementById('achList'), momentsList=document.getElementById('momentsList');
+    const achList=document.getElementById('achList');
     const snapListEl=document.getElementById('snapList'), snapCountEl=document.getElementById('snapCount');
     const snapDetail=document.getElementById('snapDetail');
     const gaugeCanvas=document.getElementById('gaugeCanvas'), gaugeCtx=gaugeCanvas.getContext('2d');
@@ -787,43 +786,6 @@
       });
     }
 
-    function renderMoments(){
-      momentsList.innerHTML='';
-      if(!moments.length){momentsList.innerHTML='<div class="no-moments">Hit "⚡ Log the Thunder" during peaks to capture what ideas are creating lightning!</div>';return;}
-      const sorted=[...moments].sort((a,b)=>b.db-a.db);
-      sorted.forEach((m,i)=>{
-        const rc=i===0?'r1':i===1?'r2':i===2?'r3':'';
-        const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
-        const lv=getLevel(m.db);
-        const row=document.createElement('div');
-        row.className='moment-row';
-        if(m.editing){
-          row.innerHTML=`<span class="moment-rank ${rc}">${medal}</span><span class="moment-db" style="color:${lv.color}">${m.db} dB</span>
-            <input class="moment-input" type="text" placeholder="What idea sparked this?" value="${m.label||''}" data-idx="${moments.indexOf(m)}"/>
-            <button class="moment-save-btn" data-idx="${moments.indexOf(m)}">Save</button>
-            <span class="moment-time">${m.time}</span>`;
-        } else {
-          row.innerHTML=`<span class="moment-rank ${rc}">${medal}</span><span class="moment-db" style="color:${lv.color}">${m.db} dB</span>
-            <span class="moment-dur">${fmtDur(m.duration||0)}</span>
-            <span class="moment-label">${m.label||'(unnamed moment)'}</span>
-            <span class="moment-time">${m.time}</span>`;
-        }
-        momentsList.appendChild(row);
-      });
-      momentsList.querySelectorAll('.moment-save-btn').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-          const idx=parseInt(btn.dataset.idx,10);
-          const input=momentsList.querySelector(`input[data-idx="${idx}"]`);
-          if(input){moments[idx].label=input.value||'(unnamed moment)';moments[idx].editing=false;localStorage.setItem('db_moments',JSON.stringify(moments));renderMoments();}
-        });
-      });
-      momentsList.querySelectorAll('.moment-input').forEach(input=>{
-        input.addEventListener('keydown',e=>{
-          if(e.key==='Enter'){const idx=parseInt(input.dataset.idx,10);moments[idx].label=input.value||'(unnamed moment)';moments[idx].editing=false;localStorage.setItem('db_moments',JSON.stringify(moments));renderMoments();}
-        });
-      });
-    }
-
     function checkRecord(db){
       if(db<=0)return;
       if(db>allTimeRecord){allTimeRecord=db;allTimeRecordTime=timeStr();localStorage.setItem('db_record',String(allTimeRecord));localStorage.setItem('db_record_time',allTimeRecordTime);peakRecord.classList.remove('flash');void peakRecord.offsetWidth;peakRecord.classList.add('flash');peakCard.classList.remove('flash-card');void peakCard.offsetWidth;peakCard.classList.add('flash-card');renderAchievements();}
@@ -868,7 +830,6 @@
       barFill.style.width=(db/MAX_DB*100)+'%';barPeak.style.left=(peakDb/MAX_DB*100)+'%';
       drawGauge(db);
       const wd=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(wd);drawWaveform(wd);
-      if(sessionCount>0){statMin.textContent=sessionMin===Infinity?'--':sessionMin;statAvg.textContent=Math.round(sessionSum/sessionCount);statMax.textContent=sessionMax===-Infinity?'--':sessionMax;}
       animId=requestAnimationFrame(loop);
     }
 
@@ -883,7 +844,7 @@
         snapshotBtn.style.display='block';
         [gaugeCard,waveCard,peakCard,achCard,barCard].forEach(c=>c.classList.remove('hidden'));
         sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
-        renderAchievements();renderMoments();checkRecord(0);loop();
+        renderAchievements();checkRecord(0);loop();
       }catch(err){alert('Microphone access is required.\n\n'+err.message);}
     }
 
@@ -920,8 +881,7 @@
       localStorage.removeItem('db_ach_durations');localStorage.removeItem('db_ach_max_streaks');
       sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;
       peakRecordDb.textContent='--';peakRecordTime.textContent='Make some thunder!';barRecordMarker.style.left='0%';
-      statMin.textContent='--';statAvg.textContent='--';statMax.textContent='--';
-      renderAchievements();renderMoments();
+      renderAchievements();
     });
 
     renderSnapshots();
