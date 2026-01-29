@@ -232,7 +232,7 @@
 
     .container {
       width: 100%;
-      max-width: 740px;
+      max-width: 960px;
       padding: 0 1rem 2rem;
       display: flex;
       flex-direction: column;
@@ -393,6 +393,22 @@
     .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.5rem; transition: opacity 0.3s; }
     .card.hidden { display: none; }
     .card-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 1rem; }
+
+    /* ── Meter Row (side-by-side) ── */
+    .meter-row {
+      display: flex;
+      gap: 1.2rem;
+      align-items: stretch;
+    }
+    .meter-row > .card { flex: 1; min-width: 0; }
+    .meter-row > .card-gauge { flex: 0 0 360px; }
+    .meter-right { display: flex; flex-direction: column; gap: 1.2rem; flex: 1; min-width: 0; }
+    .meter-right > .card { flex: 1; min-width: 0; }
+
+    @media (max-width: 900px) {
+      .meter-row { flex-direction: column; }
+      .meter-row > .card-gauge { flex: none; }
+    }
 
     /* ── Gauge ── */
     .gauge-wrap { display: flex; flex-direction: column; align-items: center; position: relative; }
@@ -674,8 +690,11 @@
       <!-- Snapshot Detail Viewer -->
       <div class="snap-detail-overlay" id="snapDetail"></div>
 
+      <!-- Meter Row: Gauge + Wave + Bar side by side -->
+      <div class="meter-row hidden" id="meterRow">
+
       <!-- Gauge -->
-      <div class="card hidden" id="gaugeCard">
+      <div class="card card-gauge" id="gaugeCard">
         <div class="card-title">⚡ Power Level</div>
         <div class="gauge-wrap">
           <span class="lightning-left">⚡</span>
@@ -691,11 +710,30 @@
         </div>
       </div>
 
+      <div class="meter-right">
       <!-- Waveform -->
-      <div class="card hidden" id="waveCard">
+      <div class="card" id="waveCard">
         <div class="card-title">Live Energy Wave</div>
         <canvas id="waveCanvas" width="1400" height="240"></canvas>
       </div>
+
+      <!-- Bar Meter -->
+      <div class="card" id="barCard">
+        <div class="card-title">Power Meter  <span style="color:var(--pink);font-size:0.7rem;">▮</span> = record</div>
+        <div class="bar-meter">
+          <div class="bar-track">
+            <div class="bar-fill" id="barFill"></div>
+            <div class="bar-record-marker" id="barRecordMarker" style="left:0%"></div>
+            <div class="bar-peak-marker" id="barPeak"></div>
+          </div>
+          <div class="bar-labels">
+            <span>0 dB</span><span>30</span><span>60</span><span>90</span><span>120</span><span>150</span><span>180 dB</span>
+          </div>
+        </div>
+      </div>
+      </div><!-- /meter-right -->
+      </div><!-- /meter-row -->
+
 
       <!-- Peak Record -->
       <div class="card hidden" id="peakCard">
@@ -718,21 +756,6 @@
         <div class="achievements" id="achList"></div>
       </div>
 
-      <!-- Bar Meter -->
-      <div class="card hidden" id="barCard">
-        <div class="card-title">Power Meter  <span style="color:var(--pink);font-size:0.7rem;">▮</span> = record</div>
-        <div class="bar-meter">
-          <div class="bar-track">
-            <div class="bar-fill" id="barFill"></div>
-            <div class="bar-record-marker" id="barRecordMarker" style="left:0%"></div>
-            <div class="bar-peak-marker" id="barPeak"></div>
-          </div>
-          <div class="bar-labels">
-            <span>0 dB</span><span>30</span><span>60</span><span>90</span><span>120</span><span>150</span><span>180 dB</span>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Confirm Clear Modal -->
@@ -785,7 +808,7 @@
     const snapshotBtn=document.getElementById('snapshotBtn'), btnText=document.getElementById('btnText');
     const gaugeCard=document.getElementById('gaugeCard'), peakCard=document.getElementById('peakCard');
     const achCard=document.getElementById('achCard'), barCard=document.getElementById('barCard');
-    const waveCard=document.getElementById('waveCard');
+    const waveCard=document.getElementById('waveCard'), meterRow=document.getElementById('meterRow');
     const dbValue=document.getElementById('dbValue'), dbLabel=document.getElementById('dbLabel');
     const barFill=document.getElementById('barFill'), barPeak=document.getElementById('barPeak');
     const barRecordMarker=document.getElementById('barRecordMarker');
@@ -1043,7 +1066,7 @@
         listening=true;sessionStartTime=Date.now();
         startBtn.classList.add('listening');btnText.textContent='Stop Listening';
         snapshotBtn.style.display='block';
-        [gaugeCard,waveCard,peakCard,achCard,barCard].forEach(c=>c.classList.remove('hidden'));
+        [meterRow,peakCard,achCard].forEach(c=>c.classList.remove('hidden'));
         sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
         renderAchievements();checkRecord(0);loop();
       }catch(err){alert('Microphone access is required.\n\n'+err.message);}
