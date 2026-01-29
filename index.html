@@ -254,18 +254,12 @@
     }
     .action-btn:hover { transform: translateY(-1px); }
 
-    #logMomentBtn {
+    #snapshotBtn {
       background: linear-gradient(135deg, var(--pink), var(--magenta));
       color: #fff;
       box-shadow: 0 4px 15px rgba(255, 20, 147, 0.3);
     }
-
-    #snapshotBtn {
-      border: 2px solid var(--teal);
-      background: transparent;
-      color: var(--cyan);
-    }
-    #snapshotBtn:hover { background: rgba(0, 188, 212, 0.1); }
+    #snapshotBtn:hover { box-shadow: 0 6px 20px rgba(255, 20, 147, 0.5); }
 
     /* ── Snapshot Detail Modal ── */
     .snap-detail-overlay { display: none; }
@@ -519,7 +513,6 @@
           <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
           <span id="btnText">Start Listening</span>
         </button>
-        <button id="logMomentBtn" class="action-btn">⚡ Log the Thunder</button>
         <button id="snapshotBtn" class="action-btn">📸 Save &amp; Reset</button>
       </div>
 
@@ -621,7 +614,7 @@
   <script>
     const MAX_DB = 150;
 
-    const startBtn=document.getElementById('startBtn'), logMomentBtn=document.getElementById('logMomentBtn');
+    const startBtn=document.getElementById('startBtn');
     const snapshotBtn=document.getElementById('snapshotBtn'), btnText=document.getElementById('btnText');
     const gaugeCard=document.getElementById('gaugeCard'), peakCard=document.getElementById('peakCard');
     const achCard=document.getElementById('achCard'), barCard=document.getElementById('barCard');
@@ -864,14 +857,6 @@
       });
     }
 
-    logMomentBtn.addEventListener('click',()=>{
-      if(!listening)return;
-      moments.push({db:currentDb,time:timeStr(),elapsed:sessionStartTime?Math.round((Date.now()-sessionStartTime)/1000):0,duration:achCurrentStreaks[Math.floor(currentDb/10)*10]||0,label:'',editing:true});
-      localStorage.setItem('db_moments',JSON.stringify(moments));
-      renderMoments();
-      setTimeout(()=>{const inputs=momentsList.querySelectorAll('.moment-input');if(inputs.length)inputs[inputs.length-1].focus();},50);
-    });
-
     function checkRecord(db){
       if(db<=0)return;
       if(db>allTimeRecord){allTimeRecord=db;allTimeRecordTime=timeStr();localStorage.setItem('db_record',String(allTimeRecord));localStorage.setItem('db_record_time',allTimeRecordTime);peakRecord.classList.remove('flash');void peakRecord.offsetWidth;peakRecord.classList.add('flash');peakCard.classList.remove('flash-card');void peakCard.offsetWidth;peakCard.classList.add('flash-card');renderAchievements();}
@@ -928,7 +913,7 @@
         source=audioCtx.createMediaStreamSource(stream);source.connect(analyser);
         listening=true;sessionStartTime=Date.now();
         startBtn.classList.add('listening');btnText.textContent='Stop Listening';
-        logMomentBtn.style.display='block';snapshotBtn.style.display='block';
+        snapshotBtn.style.display='block';
         [gaugeCard,peakCard,achCard,barCard,waveCard,momentsCard,statsCard,guideCard].forEach(c=>c.classList.remove('hidden'));
         sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
         renderAchievements();renderMoments();checkRecord(0);loop();
@@ -939,7 +924,7 @@
       listening=false;cancelAnimationFrame(animId);
       if(source)source.disconnect();if(stream)stream.getTracks().forEach(t=>t.stop());if(audioCtx)audioCtx.close();
       startBtn.classList.remove('listening');btnText.textContent='Start Listening';
-      logMomentBtn.style.display='none';snapshotBtn.style.display='none';
+      snapshotBtn.style.display='none';
       localStorage.setItem('db_ach_durations',JSON.stringify(achDurations));
       localStorage.setItem('db_ach_max_streaks',JSON.stringify(achMaxStreaks));
       renderAchievements();
