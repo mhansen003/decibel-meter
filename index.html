@@ -522,13 +522,25 @@
     }
     .thermo-record-line {
       position: absolute;
-      left: 0;
-      right: 0;
-      height: 2px;
+      left: -4px;
+      right: -4px;
+      height: 3px;
       background: var(--pink);
-      box-shadow: 0 0 6px rgba(255,20,147,0.6);
+      box-shadow: 0 0 10px rgba(255,20,147,0.8), 0 0 20px rgba(255,20,147,0.4);
       transition: bottom 0.3s ease;
-      z-index: 2;
+      z-index: 4;
+      border-radius: 2px;
+    }
+    .thermo-record-line::after {
+      content: '▸';
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--pink);
+      font-size: 0.9rem;
+      line-height: 1;
+      text-shadow: 0 0 6px rgba(255,20,147,0.6);
     }
     .thermo-scale {
       flex: 1;
@@ -1193,7 +1205,7 @@
       const lv=getLevel(db);dbValue.textContent=db;dbValue.style.color=lv.color;dbLabel.textContent=lv.label;dbLabel.style.color=lv.color;
       barFill.style.width=(db/MAX_DB*100)+'%';barPeak.style.left=(peakDb/MAX_DB*100)+'%';
       drawGauge(db);
-      thermoFill.style.height=(allTimeRecord/MAX_DB*100)+'%';thermoGlow.style.bottom=(allTimeRecord/MAX_DB*100)+'%';
+      thermoFill.style.height=(db/MAX_DB*100)+'%';thermoGlow.style.bottom=(db/MAX_DB*100)+'%';
       const wd=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(wd);drawWaveform(wd);
       animId=requestAnimationFrame(loop);
     }
