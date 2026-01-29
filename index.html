@@ -604,7 +604,7 @@
       </div>
 
       <!-- Guide -->
-      <div class="card">
+      <div class="card hidden" id="guideCard">
         <div class="card-title">⚡ Power Scale</div>
         <table class="guide-table">
           <tr><td><span class="guide-dot" style="background:var(--green)"></span>Calm / Quiet</td><td class="guide-db">0 – 30 dB</td></tr>
@@ -627,6 +627,7 @@
     const achCard=document.getElementById('achCard'), barCard=document.getElementById('barCard');
     const waveCard=document.getElementById('waveCard'), momentsCard=document.getElementById('momentsCard');
     const statsCard=document.getElementById('statsCard');
+    const guideCard=document.getElementById('guideCard');
     const dbValue=document.getElementById('dbValue'), dbLabel=document.getElementById('dbLabel');
     const barFill=document.getElementById('barFill'), barPeak=document.getElementById('barPeak');
     const barRecordMarker=document.getElementById('barRecordMarker');
@@ -928,7 +929,7 @@
         listening=true;sessionStartTime=Date.now();
         startBtn.classList.add('listening');btnText.textContent='Stop Listening';
         logMomentBtn.style.display='block';snapshotBtn.style.display='block';
-        [gaugeCard,peakCard,achCard,barCard,waveCard,momentsCard,statsCard].forEach(c=>c.classList.remove('hidden'));
+        [gaugeCard,peakCard,achCard,barCard,waveCard,momentsCard,statsCard,guideCard].forEach(c=>c.classList.remove('hidden'));
         sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
         renderAchievements();renderMoments();checkRecord(0);loop();
       }catch(err){alert('Microphone access is required.\n\n'+err.message);}
