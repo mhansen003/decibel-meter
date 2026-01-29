@@ -1276,6 +1276,7 @@
         saveBtn.style.display='block';resetBtn.style.display='block';
         [meterRow,bottomRow].forEach(c=>c.classList.remove('hidden'));
         sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
+        allTimeRecord=0;allTimeRecordTime='';localStorage.removeItem('db_record');localStorage.removeItem('db_record_time');
         renderAchievements();checkRecord(0);loop();
       }catch(err){alert('Microphone access is required.\n\n'+err.message);}
     }
