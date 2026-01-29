@@ -591,6 +591,30 @@
     }
     .modal-btn-cancel:hover { color: var(--text); background: rgba(255,255,255,0.1); }
 
+    .modal-btn-danger {
+      background: linear-gradient(135deg, #dc2626, #ef4444);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(239,68,68,0.3);
+    }
+
+    .modal-header-danger {
+      background: linear-gradient(135deg, #1a0a0a, #2d1515);
+    }
+
+    .confirm-count {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--red);
+      line-height: 1;
+    }
+    .confirm-count-label {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 0.2rem;
+    }
+
     /* ── Responsive ── */
     @media (max-width: 900px) {
       body { flex-direction: column; }
@@ -706,6 +730,27 @@
           <div class="bar-labels">
             <span>0 dB</span><span>30</span><span>60</span><span>90</span><span>120</span><span>150</span><span>180 dB</span>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm Clear Modal -->
+  <div class="modal-overlay" id="clearModal">
+    <div class="modal-box">
+      <div class="modal-header modal-header-danger">
+        <div class="modal-icon">🗑️</div>
+        <h3>Clear All Sessions?</h3>
+        <p>This action cannot be undone</p>
+      </div>
+      <div class="modal-body" style="text-align:center;">
+        <div style="margin-bottom:1.2rem;">
+          <div class="confirm-count" id="clearCount">0</div>
+          <div class="confirm-count-label">saved sessions will be deleted</div>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="clearCancel">Keep Sessions</button>
+          <button class="modal-btn modal-btn-danger" id="clearConfirm">🗑️ Clear All</button>
         </div>
       </div>
     </div>
@@ -1070,15 +1115,27 @@
     saveModal.addEventListener('click', e=>{ if(e.target===saveModal) closeSaveModal(); });
 
     // ── Clear All Sessions ──
+    const clearModal=document.getElementById('clearModal');
+    const clearCount=document.getElementById('clearCount');
+    const clearConfirm=document.getElementById('clearConfirm');
+    const clearCancel=document.getElementById('clearCancel');
+
     document.getElementById('clearAllBtn').addEventListener('click',()=>{
       if(!snapshots.length) return;
-      if(confirm('Clear all '+snapshots.length+' saved sessions? This cannot be undone.')){
-        snapshots=[];
-        localStorage.removeItem('db_snapshots');
-        renderSnapshots();
-        snapDetail.classList.remove('visible');
-        snapDetail.innerHTML='';
-      }
+      clearCount.textContent=snapshots.length;
+      clearModal.classList.add('visible');
+    });
+
+    clearCancel.addEventListener('click',()=>clearModal.classList.remove('visible'));
+    clearModal.addEventListener('click',e=>{if(e.target===clearModal)clearModal.classList.remove('visible');});
+
+    clearConfirm.addEventListener('click',()=>{
+      snapshots=[];
+      localStorage.removeItem('db_snapshots');
+      renderSnapshots();
+      snapDetail.classList.remove('visible');
+      snapDetail.innerHTML='';
+      clearModal.classList.remove('visible');
     });
 
     renderSnapshots();
