@@ -1193,7 +1193,7 @@
       const lv=getLevel(db);dbValue.textContent=db;dbValue.style.color=lv.color;dbLabel.textContent=lv.label;dbLabel.style.color=lv.color;
       barFill.style.width=(db/MAX_DB*100)+'%';barPeak.style.left=(peakDb/MAX_DB*100)+'%';
       drawGauge(db);
-      thermoFill.style.height=(db/MAX_DB*100)+'%';thermoGlow.style.bottom=(db/MAX_DB*100)+'%';
+      thermoFill.style.height=(allTimeRecord/MAX_DB*100)+'%';thermoGlow.style.bottom=(allTimeRecord/MAX_DB*100)+'%';
       const wd=new Uint8Array(analyser.fftSize);analyser.getByteTimeDomainData(wd);drawWaveform(wd);
       animId=requestAnimationFrame(loop);
     }
