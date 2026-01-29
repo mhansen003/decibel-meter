@@ -384,7 +384,7 @@
       left: 50%;
       transform: translate(-50%, -30%);
       width: 180px;
-      opacity: 0.15;
+      opacity: 0.35;
       pointer-events: none;
       z-index: 0;
     }
@@ -642,10 +642,10 @@
     let audioCtx, analyser, source, stream, listening=false, animId;
     let peakDb=0, peakDecay=0, currentDb=0;
     let sessionMin=Infinity, sessionMax=-Infinity, sessionSum=0, sessionCount=0, sessionStartTime=null;
-    let allTimeRecord=parseInt(localStorage.getItem('ps_db_record')||'0',10);
-    let allTimeRecordTime=localStorage.getItem('ps_db_record_time')||'';
-    let moments=JSON.parse(localStorage.getItem('ps_db_moments')||'[]');
-    let snapshots=JSON.parse(localStorage.getItem('ps_db_snapshots')||'[]');
+    let allTimeRecord=parseInt(localStorage.getItem('db_record')||'0',10);
+    let allTimeRecordTime=localStorage.getItem('db_record_time')||'';
+    let moments=JSON.parse(localStorage.getItem('db_moments')||'[]');
+    let snapshots=JSON.parse(localStorage.getItem('db_snapshots')||'[]');
 
     const achievements=[
       {db:30,icon:'💡',name:'Spark of Interest',desc:'Ideas starting to flow'},
@@ -660,8 +660,8 @@
       {db:150,icon:'⚡',name:'LEGENDARY POWER',desc:'Maximum power achieved!'},
     ];
 
-    let achDurations=JSON.parse(localStorage.getItem('ps_db_ach_durations')||'{}');
-    let achMaxStreaks=JSON.parse(localStorage.getItem('ps_db_ach_max_streaks')||'{}');
+    let achDurations=JSON.parse(localStorage.getItem('db_ach_durations')||'{}');
+    let achMaxStreaks=JSON.parse(localStorage.getItem('db_ach_max_streaks')||'{}');
     let achCurrentStreaks={};
     const FRAME_DUR=1/60;
 
@@ -717,7 +717,7 @@
           const idx = parseInt(btn.dataset.idx, 10);
           if (confirm('Delete "' + snapshots[idx].name + '"?')) {
             snapshots.splice(idx, 1);
-            localStorage.setItem('ps_db_snapshots', JSON.stringify(snapshots));
+            localStorage.setItem('db_snapshots', JSON.stringify(snapshots));
             renderSnapshots();
             snapDetail.classList.remove('visible');
             snapDetail.innerHTML = '';
@@ -853,12 +853,12 @@
         btn.addEventListener('click',()=>{
           const idx=parseInt(btn.dataset.idx,10);
           const input=momentsList.querySelector(`input[data-idx="${idx}"]`);
-          if(input){moments[idx].label=input.value||'(unnamed moment)';moments[idx].editing=false;localStorage.setItem('ps_db_moments',JSON.stringify(moments));renderMoments();}
+          if(input){moments[idx].label=input.value||'(unnamed moment)';moments[idx].editing=false;localStorage.setItem('db_moments',JSON.stringify(moments));renderMoments();}
         });
       });
       momentsList.querySelectorAll('.moment-input').forEach(input=>{
         input.addEventListener('keydown',e=>{
-          if(e.key==='Enter'){const idx=parseInt(input.dataset.idx,10);moments[idx].label=input.value||'(unnamed moment)';moments[idx].editing=false;localStorage.setItem('ps_db_moments',JSON.stringify(moments));renderMoments();}
+          if(e.key==='Enter'){const idx=parseInt(input.dataset.idx,10);moments[idx].label=input.value||'(unnamed moment)';moments[idx].editing=false;localStorage.setItem('db_moments',JSON.stringify(moments));renderMoments();}
         });
       });
     }
@@ -866,20 +866,20 @@
     logMomentBtn.addEventListener('click',()=>{
       if(!listening)return;
       moments.push({db:currentDb,time:timeStr(),elapsed:sessionStartTime?Math.round((Date.now()-sessionStartTime)/1000):0,duration:achCurrentStreaks[Math.floor(currentDb/10)*10]||0,label:'',editing:true});
-      localStorage.setItem('ps_db_moments',JSON.stringify(moments));
+      localStorage.setItem('db_moments',JSON.stringify(moments));
       renderMoments();
       setTimeout(()=>{const inputs=momentsList.querySelectorAll('.moment-input');if(inputs.length)inputs[inputs.length-1].focus();},50);
     });
 
     function checkRecord(db){
       if(db<=0)return;
-      if(db>allTimeRecord){allTimeRecord=db;allTimeRecordTime=timeStr();localStorage.setItem('ps_db_record',String(allTimeRecord));localStorage.setItem('ps_db_record_time',allTimeRecordTime);peakRecord.classList.remove('flash');void peakRecord.offsetWidth;peakRecord.classList.add('flash');peakCard.classList.remove('flash-card');void peakCard.offsetWidth;peakCard.classList.add('flash-card');renderAchievements();}
+      if(db>allTimeRecord){allTimeRecord=db;allTimeRecordTime=timeStr();localStorage.setItem('db_record',String(allTimeRecord));localStorage.setItem('db_record_time',allTimeRecordTime);peakRecord.classList.remove('flash');void peakRecord.offsetWidth;peakRecord.classList.add('flash');peakCard.classList.remove('flash-card');void peakCard.offsetWidth;peakCard.classList.add('flash-card');renderAchievements();}
       peakRecordDb.textContent=allTimeRecord;peakRecordTime.textContent=allTimeRecordTime?`Set at ${allTimeRecordTime}`:'Make some thunder!';barRecordMarker.style.left=((allTimeRecord/MAX_DB)*100)+'%';
     }
 
     function updateAchDurations(db){
       achievements.forEach(a=>{if(db>=a.db){achDurations[a.db]=(achDurations[a.db]||0)+FRAME_DUR;achCurrentStreaks[a.db]=(achCurrentStreaks[a.db]||0)+FRAME_DUR;if((achCurrentStreaks[a.db]||0)>(achMaxStreaks[a.db]||0))achMaxStreaks[a.db]=achCurrentStreaks[a.db];}else{achCurrentStreaks[a.db]=0;}});
-      if(sessionCount%120===0){localStorage.setItem('ps_db_ach_durations',JSON.stringify(achDurations));localStorage.setItem('ps_db_ach_max_streaks',JSON.stringify(achMaxStreaks));}
+      if(sessionCount%120===0){localStorage.setItem('db_ach_durations',JSON.stringify(achDurations));localStorage.setItem('db_ach_max_streaks',JSON.stringify(achMaxStreaks));}
     }
 
     function drawGauge(db){
@@ -939,8 +939,8 @@
       if(source)source.disconnect();if(stream)stream.getTracks().forEach(t=>t.stop());if(audioCtx)audioCtx.close();
       startBtn.classList.remove('listening');btnText.textContent='Start Listening';
       logMomentBtn.style.display='none';snapshotBtn.style.display='none';
-      localStorage.setItem('ps_db_ach_durations',JSON.stringify(achDurations));
-      localStorage.setItem('ps_db_ach_max_streaks',JSON.stringify(achMaxStreaks));
+      localStorage.setItem('db_ach_durations',JSON.stringify(achDurations));
+      localStorage.setItem('db_ach_max_streaks',JSON.stringify(achMaxStreaks));
       renderAchievements();
     }
 
@@ -960,11 +960,11 @@
         sessionStats:{min:sessionMin===Infinity?null:sessionMin,avg:sessionCount>0?Math.round(sessionSum/sessionCount):null,max:sessionMax===-Infinity?null:sessionMax},
       };
       snapshots.unshift(snapshot);
-      localStorage.setItem('ps_db_snapshots',JSON.stringify(snapshots));
+      localStorage.setItem('db_snapshots',JSON.stringify(snapshots));
       renderSnapshots();
       allTimeRecord=0;allTimeRecordTime='';moments=[];achDurations={};achMaxStreaks={};achCurrentStreaks={};
-      localStorage.removeItem('ps_db_record');localStorage.removeItem('ps_db_record_time');localStorage.removeItem('ps_db_moments');
-      localStorage.removeItem('ps_db_ach_durations');localStorage.removeItem('ps_db_ach_max_streaks');
+      localStorage.removeItem('db_record');localStorage.removeItem('db_record_time');localStorage.removeItem('db_moments');
+      localStorage.removeItem('db_ach_durations');localStorage.removeItem('db_ach_max_streaks');
       sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;
       peakRecordDb.textContent='--';peakRecordTime.textContent='Make some thunder!';barRecordMarker.style.left='0%';
       statMin.textContent='--';statAvg.textContent='--';statMax.textContent='--';
