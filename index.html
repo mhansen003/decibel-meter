@@ -463,6 +463,109 @@
     .guide-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 0.5rem; vertical-align: middle; }
     .guide-db { color: var(--muted); text-align: right; white-space: nowrap; }
 
+    /* ── Save Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.visible { display: flex; }
+
+    .modal-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 420px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      animation: modal-in 0.25s ease-out;
+    }
+    @keyframes modal-in {
+      from { opacity: 0; transform: scale(0.9) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #0d2137, #1a3a52);
+      padding: 1.5rem 1.5rem 1.2rem;
+      text-align: center;
+    }
+    .modal-header .modal-icon { font-size: 2.5rem; margin-bottom: 0.3rem; }
+    .modal-header h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--teal), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .modal-header p { color: var(--muted); font-size: 0.85rem; margin-top: 0.3rem; }
+
+    .modal-body { padding: 1.5rem; }
+
+    .modal-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+    }
+    .modal-stat {
+      text-align: center;
+      padding: 0.6rem 0.3rem;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .modal-stat .mv { font-size: 1.4rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .modal-stat .ml { font-size: 0.65rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.1rem; }
+
+    .modal-input-wrap { margin-bottom: 1.2rem; }
+    .modal-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.4rem; }
+    .modal-input {
+      width: 100%;
+      background: #1a2234;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      padding: 0.8rem 1rem;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .modal-input:focus { outline: none; border-color: var(--teal); }
+    .modal-input::placeholder { color: #475569; }
+
+    .modal-actions { display: flex; gap: 0.6rem; }
+    .modal-btn {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.15s;
+      font-family: inherit;
+    }
+    .modal-btn:hover { transform: translateY(-1px); }
+    .modal-btn-save {
+      background: linear-gradient(135deg, var(--pink), var(--magenta));
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(255,20,147,0.3);
+    }
+    .modal-btn-cancel {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .modal-btn-cancel:hover { color: var(--text); background: rgba(255,255,255,0.1); }
+
     /* ── Responsive ── */
     @media (max-width: 900px) {
       body { flex-direction: column; }
@@ -573,15 +676,37 @@
             <div class="bar-peak-marker" id="barPeak"></div>
           </div>
           <div class="bar-labels">
-            <span>0 dB</span><span>30</span><span>60</span><span>90</span><span>120</span><span>150 dB</span>
+            <span>0 dB</span><span>30</span><span>60</span><span>90</span><span>120</span><span>150</span><span>180 dB</span>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- Save Modal -->
+  <div class="modal-overlay" id="saveModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-icon">⚡</div>
+        <h3>Save This Session</h3>
+        <p>Capture this lightning before starting fresh</p>
+      </div>
+      <div class="modal-body">
+        <div class="modal-stats" id="modalStats"></div>
+        <div class="modal-input-wrap">
+          <div class="modal-label">Session Name</div>
+          <input class="modal-input" id="modalInput" type="text" placeholder='e.g. "Morning Keynote", "Breakout Session 2"' />
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="modalCancel">Cancel</button>
+          <button class="modal-btn modal-btn-save" id="modalSave">⚡ Save & Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    const MAX_DB = 150;
+    const MAX_DB = 180;
 
     const startBtn=document.getElementById('startBtn');
     const snapshotBtn=document.getElementById('snapshotBtn'), btnText=document.getElementById('btnText');
@@ -617,7 +742,10 @@
       {db:120,icon:'🔥',name:'Lightning Strike',desc:'Electric atmosphere'},
       {db:130,icon:'💥',name:'Power Overload',desc:'Off the charts energy'},
       {db:140,icon:'🌪️',name:'Category 5',desc:'Unstoppable force'},
-      {db:150,icon:'⚡',name:'LEGENDARY POWER',desc:'Maximum power achieved!'},
+      {db:150,icon:'⚡',name:'LEGENDARY POWER',desc:'Beyond all limits!'},
+      {db:160,icon:'☢️',name:'Nuclear Fusion',desc:'Power beyond measure'},
+      {db:170,icon:'🌌',name:'Supernova',desc:'Universe-shaking energy'},
+      {db:180,icon:'💫',name:'BIG BANG',desc:'Maximum power achieved!'},
     ];
 
     let achDurations=JSON.parse(localStorage.getItem('db_ach_durations')||'{}');
@@ -804,7 +932,7 @@
       let pf=0;segs.forEach(s=>{gaugeCtx.beginPath();gaugeCtx.arc(cx,cy,radius,sa+pf*Math.PI,sa+s.end*Math.PI);gaugeCtx.lineWidth=22;gaugeCtx.strokeStyle=s.color;gaugeCtx.lineCap='butt';gaugeCtx.globalAlpha=.25;gaugeCtx.stroke();pf=s.end;});
       const fr=clamp(db/MAX_DB,0,1);pf=0;segs.forEach(s=>{if(fr>pf){gaugeCtx.beginPath();gaugeCtx.arc(cx,cy,radius,sa+pf*Math.PI,sa+Math.min(fr,s.end)*Math.PI);gaugeCtx.lineWidth=22;gaugeCtx.strokeStyle=s.color;gaugeCtx.globalAlpha=1;gaugeCtx.stroke();}pf=s.end;});
       gaugeCtx.globalAlpha=1;
-      for(let i=0;i<=15;i++){const a=sa+(i/15)*Math.PI,maj=i%3===0,ir=radius-(maj?32:26),or=radius-16;gaugeCtx.beginPath();gaugeCtx.moveTo(cx+ir*Math.cos(a),cy+ir*Math.sin(a));gaugeCtx.lineTo(cx+or*Math.cos(a),cy+or*Math.sin(a));gaugeCtx.strokeStyle=maj?'#94a3b8':'#475569';gaugeCtx.lineWidth=maj?2:1;gaugeCtx.stroke();if(maj){const lr=ir-14;gaugeCtx.fillStyle='#94a3b8';gaugeCtx.font='600 13px system-ui';gaugeCtx.textAlign='center';gaugeCtx.textBaseline='middle';gaugeCtx.fillText(String(i*10),cx+lr*Math.cos(a),cy+lr*Math.sin(a));}}
+      for(let i=0;i<=18;i++){const a=sa+(i/18)*Math.PI,maj=i%3===0,ir=radius-(maj?32:26),or=radius-16;gaugeCtx.beginPath();gaugeCtx.moveTo(cx+ir*Math.cos(a),cy+ir*Math.sin(a));gaugeCtx.lineTo(cx+or*Math.cos(a),cy+or*Math.sin(a));gaugeCtx.strokeStyle=maj?'#94a3b8':'#475569';gaugeCtx.lineWidth=maj?2:1;gaugeCtx.stroke();if(maj){const lr=ir-14;gaugeCtx.fillStyle='#94a3b8';gaugeCtx.font='600 13px system-ui';gaugeCtx.textAlign='center';gaugeCtx.textBaseline='middle';gaugeCtx.fillText(String(i*10),cx+lr*Math.cos(a),cy+lr*Math.sin(a));}}
       if(allTimeRecord>0){const ra=sa+(allTimeRecord/MAX_DB)*Math.PI;gaugeCtx.beginPath();gaugeCtx.arc(cx+(radius+2)*Math.cos(ra),cy+(radius+2)*Math.sin(ra),5,0,Math.PI*2);gaugeCtx.fillStyle='#ff1493';gaugeCtx.shadowColor='rgba(255,20,147,0.6)';gaugeCtx.shadowBlur=10;gaugeCtx.fill();gaugeCtx.shadowBlur=0;}
       const na=sa+fr*Math.PI;gaugeCtx.save();gaugeCtx.translate(cx,cy);gaugeCtx.rotate(na);gaugeCtx.beginPath();gaugeCtx.moveTo(0,-3);gaugeCtx.lineTo(radius-38,0);gaugeCtx.lineTo(0,3);gaugeCtx.closePath();gaugeCtx.fillStyle='#f8fafc';gaugeCtx.shadowColor='rgba(255,255,255,0.3)';gaugeCtx.shadowBlur=8;gaugeCtx.fill();gaugeCtx.restore();
       gaugeCtx.beginPath();gaugeCtx.arc(cx,cy,7,0,Math.PI*2);gaugeCtx.fillStyle='#e2e8f0';gaugeCtx.fill();
@@ -860,10 +988,32 @@
 
     startBtn.addEventListener('click',()=>{if(listening)stopListening();else startListening();});
 
-    snapshotBtn.addEventListener('click',()=>{
-      const name=prompt('⚡ Name this session:\n(e.g. "Morning Keynote", "Breakout Session 2")');
-      if(name===null)return;
-      const sessionName=name.trim()||'Unnamed Session';
+    // ── Save Modal ──
+    const saveModal=document.getElementById('saveModal');
+    const modalInput=document.getElementById('modalInput');
+    const modalStats=document.getElementById('modalStats');
+    const modalSave=document.getElementById('modalSave');
+    const modalCancel=document.getElementById('modalCancel');
+
+    function openSaveModal(){
+      const avg=sessionCount>0?Math.round(sessionSum/sessionCount):'--';
+      const peak=allTimeRecord||'--';
+      const achCount=achievements.filter(a=>allTimeRecord>=a.db).length;
+      const peakLevel=getLevel(allTimeRecord||0);
+      modalStats.innerHTML=`
+        <div class="modal-stat"><div class="mv" style="color:${peakLevel.color}">${peak}</div><div class="ml">⚡ Peak dB</div></div>
+        <div class="modal-stat"><div class="mv">${avg}</div><div class="ml">📊 Avg dB</div></div>
+        <div class="modal-stat"><div class="mv">${achCount}<span style="font-size:0.7rem;color:var(--muted)">/${achievements.length}</span></div><div class="ml">🏆 Unlocked</div></div>
+      `;
+      modalInput.value='';
+      saveModal.classList.add('visible');
+      setTimeout(()=>modalInput.focus(),100);
+    }
+
+    function closeSaveModal(){ saveModal.classList.remove('visible'); }
+
+    function doSaveAndReset(){
+      const sessionName=modalInput.value.trim()||'Unnamed Session';
       const snapshot={
         name: sessionName,
         date: dateStr(),
@@ -882,7 +1032,14 @@
       sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;
       peakRecordDb.textContent='--';peakRecordTime.textContent='Make some thunder!';barRecordMarker.style.left='0%';
       renderAchievements();
-    });
+      closeSaveModal();
+    }
+
+    snapshotBtn.addEventListener('click', openSaveModal);
+    modalCancel.addEventListener('click', closeSaveModal);
+    modalSave.addEventListener('click', doSaveAndReset);
+    modalInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doSaveAndReset(); });
+    saveModal.addEventListener('click', e=>{ if(e.target===saveModal) closeSaveModal(); });
 
     renderSnapshots();
   </script>
