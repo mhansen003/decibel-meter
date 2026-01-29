@@ -536,6 +536,12 @@
         </div>
       </div>
 
+      <!-- Waveform -->
+      <div class="card hidden" id="waveCard">
+        <div class="card-title">Live Energy Wave</div>
+        <canvas id="waveCanvas" width="1400" height="240"></canvas>
+      </div>
+
       <!-- Peak Record -->
       <div class="card hidden" id="peakCard">
         <div class="card-title">⚡ Peak Thunder Record</div>
@@ -571,43 +577,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Waveform -->
-      <div class="card hidden" id="waveCard">
-        <div class="card-title">Live Energy Wave</div>
-        <canvas id="waveCanvas" width="1400" height="240"></canvas>
-      </div>
-
-      <!-- Moments -->
-      <div class="card hidden" id="momentsCard">
-        <div class="card-title">⚡ Thunder Moments</div>
-        <div class="moments-list" id="momentsList">
-          <div class="no-moments">Hit "⚡ Log the Thunder" during peaks to capture what ideas are creating lightning!</div>
-        </div>
-      </div>
-
-      <!-- Stats -->
-      <div class="card hidden" id="statsCard">
-        <div class="card-title">Session Statistics</div>
-        <div class="stats-grid">
-          <div class="stat-item"><div class="stat-value" id="statMin">--</div><div class="stat-label">Min dB</div></div>
-          <div class="stat-item"><div class="stat-value" id="statAvg">--</div><div class="stat-label">Avg dB</div></div>
-          <div class="stat-item"><div class="stat-value" id="statMax">--</div><div class="stat-label">Max dB</div></div>
-        </div>
-      </div>
-
-      <!-- Guide -->
-      <div class="card hidden" id="guideCard">
-        <div class="card-title">⚡ Power Scale</div>
-        <table class="guide-table">
-          <tr><td><span class="guide-dot" style="background:var(--green)"></span>Calm / Quiet</td><td class="guide-db">0 – 30 dB</td></tr>
-          <tr><td><span class="guide-dot" style="background:var(--green)"></span>Light Chatter</td><td class="guide-db">30 – 60 dB</td></tr>
-          <tr><td><span class="guide-dot" style="background:var(--teal)"></span>Energy Building</td><td class="guide-db">60 – 80 dB</td></tr>
-          <tr><td><span class="guide-dot" style="background:var(--cyan)"></span>Sparks Flying!</td><td class="guide-db">80 – 100 dB</td></tr>
-          <tr><td><span class="guide-dot" style="background:var(--pink)"></span>Lightning Strike!</td><td class="guide-db">100 – 120 dB</td></tr>
-          <tr><td><span class="guide-dot" style="background:var(--magenta)"></span>THUNDER & LIGHTNING!</td><td class="guide-db">120 – 150 dB</td></tr>
-        </table>
-      </div>
     </div>
   </div>
 
@@ -618,9 +587,7 @@
     const snapshotBtn=document.getElementById('snapshotBtn'), btnText=document.getElementById('btnText');
     const gaugeCard=document.getElementById('gaugeCard'), peakCard=document.getElementById('peakCard');
     const achCard=document.getElementById('achCard'), barCard=document.getElementById('barCard');
-    const waveCard=document.getElementById('waveCard'), momentsCard=document.getElementById('momentsCard');
-    const statsCard=document.getElementById('statsCard');
-    const guideCard=document.getElementById('guideCard');
+    const waveCard=document.getElementById('waveCard');
     const dbValue=document.getElementById('dbValue'), dbLabel=document.getElementById('dbLabel');
     const barFill=document.getElementById('barFill'), barPeak=document.getElementById('barPeak');
     const barRecordMarker=document.getElementById('barRecordMarker');
@@ -914,7 +881,7 @@
         listening=true;sessionStartTime=Date.now();
         startBtn.classList.add('listening');btnText.textContent='Stop Listening';
         snapshotBtn.style.display='block';
-        [gaugeCard,peakCard,achCard,barCard,waveCard,momentsCard,statsCard,guideCard].forEach(c=>c.classList.remove('hidden'));
+        [gaugeCard,waveCard,peakCard,achCard,barCard].forEach(c=>c.classList.remove('hidden'));
         sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
         renderAchievements();renderMoments();checkRecord(0);loop();
       }catch(err){alert('Microphone access is required.\n\n'+err.message);}
