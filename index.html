@@ -1368,6 +1368,23 @@
     const dbHistory=[];
     const HISTORY_MAX_POINTS=600;
 
+    function dbColor(db){
+      if(db<30) return'#7cb342';
+      if(db<60) return'#8bc34a';
+      if(db<80) return'#00bcd4';
+      if(db<100) return'#26c6da';
+      if(db<120) return'#ff1493';
+      return'#e91e8c';
+    }
+    function dbGlow(db){
+      if(db<30) return'rgba(124,179,66,0.15)';
+      if(db<60) return'rgba(139,195,74,0.18)';
+      if(db<80) return'rgba(0,188,212,0.22)';
+      if(db<100) return'rgba(38,198,218,0.28)';
+      if(db<120) return'rgba(255,20,147,0.35)';
+      return'rgba(233,30,140,0.45)';
+    }
+
     function drawHistory(){
       const W=historyCanvas.width,H=historyCanvas.height;
       historyCtx.clearRect(0,0,W,H);
@@ -1389,36 +1406,49 @@
         historyCtx.fillText(lv+'',4,y-2);
       });
 
-      // Fill under curve
       const step=W/(HISTORY_MAX_POINTS-1);
       const startIdx=Math.max(0,dbHistory.length-HISTORY_MAX_POINTS);
       const pts=dbHistory.slice(startIdx);
 
-      const fillGrad=historyCtx.createLinearGradient(0,0,0,H);
-      fillGrad.addColorStop(0,'rgba(0,188,212,0.25)');
-      fillGrad.addColorStop(0.5,'rgba(0,188,212,0.08)');
-      fillGrad.addColorStop(1,'rgba(0,188,212,0)');
-      historyCtx.beginPath();
-      historyCtx.moveTo(0,H);
+      // Fill columns colored by dB intensity
       for(let i=0;i<pts.length;i++){
         const x=i*step;const y=H-(pts[i]/MAX_DB)*H;
-        historyCtx.lineTo(x,y);
+        const colW=Math.ceil(step)+1;
+        const grad=historyCtx.createLinearGradient(0,y,0,H);
+        grad.addColorStop(0,dbGlow(pts[i]));
+        grad.addColorStop(1,'rgba(0,0,0,0)');
+        historyCtx.fillStyle=grad;
+        historyCtx.fillRect(x,y,colW,H-y);
       }
-      historyCtx.lineTo((pts.length-1)*step,H);
-      historyCtx.closePath();
-      historyCtx.fillStyle=fillGrad;
-      historyCtx.fill();
 
-      // Main line
-      const lineGrad=historyCtx.createLinearGradient(0,0,W,0);
-      lineGrad.addColorStop(0,'#00bcd4');lineGrad.addColorStop(0.6,'#26c6da');lineGrad.addColorStop(1,'#ff1493');
-      historyCtx.beginPath();
-      for(let i=0;i<pts.length;i++){
-        const x=i*step;const y=H-(pts[i]/MAX_DB)*H;
-        i===0?historyCtx.moveTo(x,y):historyCtx.lineTo(x,y);
+      // Draw line segments colored by dB value
+      historyCtx.lineWidth=2.5;
+      for(let i=1;i<pts.length;i++){
+        const x0=(i-1)*step,y0=H-(pts[i-1]/MAX_DB)*H;
+        const x1=i*step,y1=H-(pts[i]/MAX_DB)*H;
+        const avgDb=(pts[i-1]+pts[i])/2;
+        historyCtx.beginPath();
+        historyCtx.moveTo(x0,y0);
+        historyCtx.lineTo(x1,y1);
+        historyCtx.strokeStyle=dbColor(avgDb);
+        historyCtx.stroke();
       }
-      historyCtx.strokeStyle=lineGrad;historyCtx.lineWidth=2;historyCtx.stroke();
-      historyCtx.globalAlpha=0.3;historyCtx.stroke();historyCtx.globalAlpha=1;
+
+      // Glow pass for bright peaks
+      historyCtx.lineWidth=6;historyCtx.globalAlpha=0.15;
+      for(let i=1;i<pts.length;i++){
+        const x0=(i-1)*step,y0=H-(pts[i-1]/MAX_DB)*H;
+        const x1=i*step,y1=H-(pts[i]/MAX_DB)*H;
+        const avgDb=(pts[i-1]+pts[i])/2;
+        if(avgDb>=80){
+          historyCtx.beginPath();
+          historyCtx.moveTo(x0,y0);
+          historyCtx.lineTo(x1,y1);
+          historyCtx.strokeStyle=dbColor(avgDb);
+          historyCtx.stroke();
+        }
+      }
+      historyCtx.globalAlpha=1;
     }
 
     function loop(){
