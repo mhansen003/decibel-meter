@@ -1048,6 +1048,26 @@
     </div>
   </div>
 
+  <!-- Confirm Delete Single Session Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal-box">
+      <div class="modal-header modal-header-danger">
+        <div class="modal-icon">🗑️</div>
+        <h3>Delete Session?</h3>
+        <p>This action cannot be undone</p>
+      </div>
+      <div class="modal-body" style="text-align:center;">
+        <div style="margin-bottom:1.2rem;">
+          <div class="confirm-count-label">"<span id="deleteSessionName"></span>" will be permanently deleted</div>
+        </div>
+        <div class="modal-actions">
+          <button class="modal-btn modal-btn-cancel" id="deleteCancel">Keep It</button>
+          <button class="modal-btn modal-btn-danger" id="deleteConfirm">🗑️ Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Save Modal -->
   <div class="modal-overlay" id="saveModal">
     <div class="modal-box">
@@ -1177,13 +1197,9 @@
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
           const idx = parseInt(btn.dataset.idx, 10);
-          if (confirm('Delete "' + snapshots[idx].name + '"?')) {
-            snapshots.splice(idx, 1);
-            localStorage.setItem('db_snapshots', JSON.stringify(snapshots));
-            renderSnapshots();
-            snapDetail.classList.remove('visible');
-            snapDetail.innerHTML = '';
-          }
+          pendingDeleteIdx = idx;
+          deleteSessionName.textContent = snapshots[idx].name;
+          deleteModal.classList.add('visible');
         });
       });
     }
@@ -1424,6 +1440,28 @@
     modalSave.addEventListener('click', doSaveAndReset);
     modalInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doSaveAndReset(); });
     saveModal.addEventListener('click', e=>{ if(e.target===saveModal) closeSaveModal(); });
+
+    // ── Delete Single Session ──
+    const deleteModal=document.getElementById('deleteModal');
+    const deleteSessionName=document.getElementById('deleteSessionName');
+    const deleteConfirm=document.getElementById('deleteConfirm');
+    const deleteCancel=document.getElementById('deleteCancel');
+    let pendingDeleteIdx=-1;
+
+    deleteCancel.addEventListener('click',()=>deleteModal.classList.remove('visible'));
+    deleteModal.addEventListener('click',e=>{if(e.target===deleteModal)deleteModal.classList.remove('visible');});
+
+    deleteConfirm.addEventListener('click',()=>{
+      if(pendingDeleteIdx>=0&&pendingDeleteIdx<snapshots.length){
+        snapshots.splice(pendingDeleteIdx,1);
+        localStorage.setItem('db_snapshots',JSON.stringify(snapshots));
+        renderSnapshots();
+        snapDetail.classList.remove('visible');
+        snapDetail.innerHTML='';
+      }
+      pendingDeleteIdx=-1;
+      deleteModal.classList.remove('visible');
+    });
 
     // ── Clear All Sessions ──
     const clearModal=document.getElementById('clearModal');
