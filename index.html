@@ -47,6 +47,26 @@
       overflow-y: auto;
     }
 
+    .sidebar-logo {
+      padding: 1rem 1rem 0.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(0,188,212,0.06) 0%, transparent 100%);
+    }
+
+    .sidebar-logo img {
+      height: 36px;
+      width: auto;
+      opacity: 0.9;
+      transition: opacity 0.2s;
+    }
+
+    .sidebar-logo img:hover {
+      opacity: 1;
+    }
+
     .sidebar-header {
       padding: 1.2rem 1rem;
       border-bottom: 1px solid var(--border);
@@ -183,6 +203,7 @@
       overflow: hidden;
       min-width: 0;
       height: 100vh;
+      position: relative;
     }
 
     header {
@@ -245,7 +266,16 @@
     }
 
     /* ── Buttons ── */
-    .btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; flex-shrink: 0; }
+    .btn-row { display: flex; gap: 0.6rem; flex-wrap: wrap; flex-shrink: 0; transition: all 0.3s; }
+
+    .btn-row.compact {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.8rem;
+      z-index: 20;
+      gap: 0.3rem;
+      flex-wrap: nowrap;
+    }
 
     #startBtn {
       flex: 1;
@@ -259,6 +289,7 @@
       font-size: 1.05rem;
       font-weight: 600;
       cursor: pointer;
+      font-family: inherit;
       background: linear-gradient(135deg, var(--teal), var(--cyan));
       color: #fff;
       transition: transform 0.15s, box-shadow 0.15s;
@@ -271,6 +302,19 @@
       box-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
     }
 
+    .btn-row.compact #startBtn {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 10px;
+      font-size: 0;
+      gap: 0;
+      justify-content: center;
+    }
+    .btn-row.compact #startBtn svg { width: 18px; height: 18px; }
+    .btn-row.compact #btnText { display: none; }
+
     .action-btn {
       display: none;
       padding: 0.9rem 1.2rem;
@@ -281,8 +325,21 @@
       cursor: pointer;
       transition: transform 0.15s;
       white-space: nowrap;
+      font-family: inherit;
     }
     .action-btn:hover { transform: translateY(-1px); }
+
+    .btn-row.compact .action-btn {
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-row.compact .action-btn .btn-label { display: none; }
 
     #saveBtn {
       background: linear-gradient(135deg, var(--pink), var(--magenta));
@@ -476,15 +533,15 @@
     }
 
     /* ── Gauge ── */
-    .gauge-wrap { display: flex; flex-direction: column; align-items: center; position: relative; flex: 1; justify-content: center; }
+    .gauge-wrap { display: flex; flex-direction: column; align-items: center; position: relative; flex: 1; justify-content: center; overflow: visible; }
 
     .gauge-logo {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -30%);
-      width: 340px;
-      opacity: 0.35;
+      width: 460px;
+      opacity: 0.4;
       pointer-events: none;
       z-index: 0;
     }
@@ -850,7 +907,7 @@
       .peak-db { font-size: 3rem; }
       .stats-grid { gap: 0.5rem; }
       .stat-value { font-size: 1.3rem; }
-      .gauge-logo { width: 170px; }
+      .gauge-logo { width: 220px; }
     }
 
     /* ── Splash Screen ── */
@@ -931,6 +988,9 @@
 
   <!-- Sidebar -->
   <aside class="sidebar">
+    <div class="sidebar-logo">
+      <img src="./images/clear-ai-logo.png" alt="Clear AI">
+    </div>
     <div class="sidebar-header">
       <div class="sidebar-header-row">
         <h2>⚡ Sessions <span class="snap-count" id="snapCount">0</span></h2>
@@ -962,8 +1022,8 @@
           <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
           <span id="btnText">Start Listening</span>
         </button>
-        <button id="saveBtn" class="action-btn">💾 Save</button>
-        <button id="resetBtn" class="action-btn">🔄 Reset</button>
+        <button id="saveBtn" class="action-btn">💾<span class="btn-label"> Save</span></button>
+        <button id="resetBtn" class="action-btn">🔄<span class="btn-label"> Reset</span></button>
       </div>
 
       <!-- Snapshot Detail Viewer -->
@@ -1486,8 +1546,9 @@
         analyser=audioCtx.createAnalyser();analyser.fftSize=4096;analyser.smoothingTimeConstant=.2;analyser.minDecibels=-127;analyser.maxDecibels=0;
         source=audioCtx.createMediaStreamSource(stream);source.connect(analyser);
         listening=true;sessionStartTime=Date.now();
-        startBtn.classList.add('listening');btnText.textContent='Stop Listening';
+        startBtn.classList.add('listening');btnText.textContent='Stop';
         saveBtn.style.display='block';resetBtn.style.display='block';
+        document.querySelector('.btn-row').classList.add('compact');
         [meterRow,bottomRow,historyRow].forEach(c=>c.classList.remove('hidden'));
         dbHistory.length=0;
         sessionMin=Infinity;sessionMax=-Infinity;sessionSum=0;sessionCount=0;peakDb=0;achCurrentStreaks={};
@@ -1501,6 +1562,7 @@
       if(source)source.disconnect();if(stream)stream.getTracks().forEach(t=>t.stop());if(audioCtx)audioCtx.close();
       startBtn.classList.remove('listening');btnText.textContent='Start Listening';
       saveBtn.style.display='none';resetBtn.style.display='none';
+      document.querySelector('.btn-row').classList.remove('compact');
       dbHistory.length=0;historyCtx.clearRect(0,0,historyCanvas.width,historyCanvas.height);
       [meterRow,bottomRow,historyRow].forEach(c=>c.classList.add('hidden'));
       splashScreen.classList.remove('hidden');
