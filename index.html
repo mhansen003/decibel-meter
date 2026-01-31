@@ -1500,6 +1500,9 @@
 
     splashBtn.addEventListener('click', () => {
       splashScreen.classList.add('hidden');
+      splashScreen.addEventListener('transitionend', () => {
+        splashScreen.remove();
+      }, { once: true });
       startListening();
     });
   </script>
