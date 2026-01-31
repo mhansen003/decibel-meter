@@ -1462,6 +1462,8 @@
       startBtn.classList.remove('listening');btnText.textContent='Start Listening';
       saveBtn.style.display='none';resetBtn.style.display='none';
       dbHistory.length=0;historyCtx.clearRect(0,0,historyCanvas.width,historyCanvas.height);
+      [meterRow,bottomRow,historyRow].forEach(c=>c.classList.add('hidden'));
+      splashScreen.classList.remove('hidden');
       localStorage.setItem('db_ach_durations',JSON.stringify(achDurations));
       localStorage.setItem('db_ach_max_streaks',JSON.stringify(achMaxStreaks));
       renderAchievements();
@@ -1587,9 +1589,6 @@
 
     splashBtn.addEventListener('click', () => {
       splashScreen.classList.add('hidden');
-      splashScreen.addEventListener('transitionend', () => {
-        splashScreen.remove();
-      }, { once: true });
       startListening();
     });
   </script>
