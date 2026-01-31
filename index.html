@@ -834,9 +834,75 @@
       .stat-value { font-size: 1.3rem; }
       .gauge-logo { width: 120px; }
     }
+
+    /* ── Splash Screen ── */
+    #splashScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2.5rem;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+    #splashScreen.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .splash-logo {
+      width: min(340px, 70vw);
+      filter: drop-shadow(0 0 40px rgba(0, 188, 212, 0.25));
+      animation: splash-float 3s ease-in-out infinite;
+    }
+    @keyframes splash-float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .splash-btn {
+      padding: 1.1rem 3rem;
+      border: none;
+      border-radius: 14px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--teal), var(--cyan));
+      box-shadow: 0 6px 30px rgba(0, 188, 212, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      letter-spacing: 0.02em;
+    }
+    .splash-btn:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 10px 40px rgba(0, 188, 212, 0.55);
+    }
+    .splash-btn:active {
+      transform: translateY(0) scale(0.98);
+    }
+    .splash-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
   </style>
 </head>
 <body>
+  <!-- Splash Screen -->
+  <div id="splashScreen">
+    <img class="splash-logo" id="splashLogo" alt="Sales Summit">
+    <button class="splash-btn" id="splashBtn">
+      <svg viewBox="0 0 24 24"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>
+      Start Listenin'
+    </button>
+  </div>
+
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-header">
@@ -1376,6 +1442,20 @@
     });
 
     renderSnapshots();
+
+    // ── Splash Screen ──
+    const splashScreen = document.getElementById('splashScreen');
+    const splashLogo = document.getElementById('splashLogo');
+    const splashBtn = document.getElementById('splashBtn');
+
+    // Reuse the existing base64 logo from the gauge
+    const gaugeLogo = document.querySelector('.gauge-logo');
+    if (gaugeLogo) splashLogo.src = gaugeLogo.src;
+
+    splashBtn.addEventListener('click', () => {
+      splashScreen.classList.add('hidden');
+      startListening();
+    });
   </script>
 </body>
 </html>
